@@ -1,0 +1,169 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  OPERADOR
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  documento     String   @unique
+  nombre        String?
+  apellidos     String?
+  role          Role     @default(OPERADOR)
+  active        Boolean  @default(true)
+  lastLogin     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  fichas        FichaHogar[]
+}
+
+model FichaHogar {
+  id                String   @id @default(uuid())
+  consecutivo       Int      @unique @default(autoincrement())
+  
+  // I. CONTROL Y UBICACIÓN (Registro Tipo 2)
+  estadoVisita      String   // 1=Efectiva, 2=No efectiva, 3=Negada
+  departamento      String
+  municipio         String
+  territorio        String   // T01..T43 (sin T29, T40)
+  microterritorio   String   // M1..M4
+  uzpe              String?
+  centroPoblado     String?  // Barrio/Vereda
+  descripcionUbicacion String?
+  direccion         String
+  latitud           Float?
+  longitud          Float?
+  fechaDiligenciamiento DateTime @default(now())
+  
+  // Matrioshka - Identificadores Jerárquicos
+  numHogar          String?
+  numFamilia        String?
+  codFicha          String?
+  observacionesRechazo String?
+  
+  // Responsable
+  numEBS            String?  // Número identificación Equipo Básico de Salud
+  prestadorPrimario String?
+  tipoDocEncuestador String?
+  numDocEncuestador String?
+  perfilEncuestador String?
+  
+  // II. VIVIENDA Y ENTORNO
+  tipoVivienda      Int?     // 1=Casa, 2=Apto, ... 12=Otro
+  tipoViviendaDesc  String?  // Si tipo = 12
+  matParedes        Int?     // catalogo
+  matPisos          Int?
+  matTechos         Int?
+  numHogares        Int?
+  numDormitorios    Int?
+  estratoSocial     Int?     // 1-6
+  hacinamiento      Boolean?
+  
+  // Saneamiento (Multi-select = arrays)
+  fuenteAgua        Int[]
+  dispExcretas      Int[]
+  aguasResiduales   Int[]
+  dispResiduos      Int[]
+  riesgoAccidente   Int[]
+  fuenteEnergia     Int?
+
+  // Vectores y Zoonosis
+  presenciaVectores Boolean?
+  animales          Int[]   // catalogo de animales
+  cantAnimales      Int?
+  vacunacionMascotas Boolean?
+  
+  // III. CARACTERIZACIÓN FAMILIA
+  tipoFamilia       Int?     // 1=Nuclear, 2=Monoparental, etc.
+  numIntegrantes    Int?
+  
+  // Instrumentos familiares
+  apgar             Int?     // 1=Normal, 2=Disfunción leve, 3=Mod, 4=Severa
+  ecomapa           Int?     // 1=Positivo, 2=Tenue, 3=Estresante, 4=Fluye, 5=Intenso
+  
+  // Riesgo psicosocial
+  cuidadorPrincipal Boolean?
+  zarit             Int?     // 1=Ausencia, 2=Ligera, 3=Intensa (solo si cuidadorPrincipal=true)
+  vulnerabilidades  String[] // Víctimas, VIF, SPA, trabajo infantil
+  
+  // Relaciones
+  encuestadorId     String?  // Opcional para formulario público
+  encuestador       User?    @relation(fields: [encuestadorId], references: [id])
+  integrantes       Integrante[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Integrante {
+  id                String   @id @default(uuid())
+  fichaId           String
+  ficha             FichaHogar @relation(fields: [fichaId], references: [id], onDelete: Cascade)
+  
+  // IV. DATOS BÁSICOS
+  primerNombre      String
+  segundoNombre     String?
+  primerApellido    String
+  segundoApellido   String?
+  tipoDoc           String   // CC, TI, RC, CE, PA, MS, NUIP
+  numDoc            String
+  fechaNacimiento   String   // AAAA-MM-DD
+  // edad y cursoVida son calculados en frontend
+  parentesco        Int      // catalogo
+  sexo              String   // HOMBRE, MUJER, INDETERMINADO
+  gestante          String?  // SI, NO, NA
+  telefono          String?
+  
+  // Educación y Trabajo
+  nivelEducativo    Int?     // catalogo
+  ocupacion         Int?     // catalogo
+  regimen           String?  // SUBSIDIADO, CONTRIBUTIVO, ESPECIAL, EXCEPCION, NO_AFILIADO
+  eapb              String?
+  
+  // Enfoque diferencial
+  etnia             Int?     // catalogo
+  puebloIndigena    String?  // condicional si etnia=1 (Indígena)
+  grupoPoblacional  Int[]    // multi-select
+  discapacidades    Int[]    // multi-select
+  
+  // V. EVALUACIÓN SALUD
+  // Antecedentes patológicos
+  antecedentes      Json?    // { cancer: bool, hta: bool, diabetes: bool, ... }
+  antecTransmisibles Json?   // { tuberculosis: bool, ... }
+  
+  // Antropometría
+  peso              Float?
+  talla             Float?
+  perimetroBraquial Float?
+  diagNutricional   Int?     // calculado: 1=Normal, 2=Obesidad, 3=Sobrepeso, 4=Riesgo, 5=Desnutrición
+  
+  // Prevención
+  practicaDeportiva Boolean?
+  lactanciaMaterna  Boolean?
+  lactanciaMeses    Int?
+  esquemaAtenciones Boolean?
+  intervencionesPendientes Int[]
+  enfermedadAguda   Boolean?
+  recibeAtencionMedica Boolean?
+  
+  // Remisiones APS
+  remisiones        String[] // Psicología, Odontología, Medicina, Enfermería, Trabajo Social
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([tipoDoc, numDoc])
+}

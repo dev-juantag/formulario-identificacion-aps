@@ -1,0 +1,44 @@
+# next.js
+/.next/
+/out/
+
+# dependencies
+/node_modules/
+
+# env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# firebase
+.firebase/
+**/*.local.js
+**/*.local.ts
+firebase-debug.log*
+firestore-debug.log*
+
+# seed files and sensitive
+src/lib/seed-firebase.ts.local
+*.seed
+*.pem
+*.json
+!package.json
+!tsconfig.json
+!next.config.mjs
+!postcss.config.mjs
+!tailwind.config.ts
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local build
+.vercel

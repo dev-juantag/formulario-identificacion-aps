@@ -1,0 +1,30 @@
+
+> identificacion-aps@0.1.0 build
+> next build
+
+▲ Next.js 16.2.0 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.3s
+  Running TypeScript ...
+Failed to type check.
+
+.next/dev/types/validator.ts:144:31
+Type error: Type 'typeof import("C:/Users/juant/OneDrive/Documentos/JuanF/Proyectos/identificacion-aps/src/app/api/admin/fichas/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/fichas/[id]">'.
+  Types of property 'PATCH' are incompatible.
+    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ message: string; ficha: { id: string; createdAt: Date; updatedAt: Date; consecutivo: number; estadoVisita: string; ... 46 more ...; encuestadorId: string | null; }; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+
+  [90m142 |[0m   [36mtype[0m __IsExpected<[33mSpecific[0m [36mextends[0m [33mRouteHandlerConfig[0m<[32m"/api/admin/fichas/[id]"[0m>> = [33mSpec...[0m
+  [90m143 |[0m   [36mconst[0m handler = {} [36mas[0m [36mtypeof[0m [36mimport[0m([32m"../../../src/app/api/admin/fichas/[id]/route.js"[0m)
+[31m[1m>[0m [90m144 |[0m   [36mtype[0m __Check = __IsExpected<[36mtypeof[0m handler>
+  [90m    |[0m                               [31m[1m^[0m
+  [90m145 |[0m   [90m// @ts-ignore[0m
+  [90m146 |[0m   [36mtype[0m __Unused = __Check
+  [90m147 |[0m }
+Next.js build worker exited with code: 1 and signal: null
