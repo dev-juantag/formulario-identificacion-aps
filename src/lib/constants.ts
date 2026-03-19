@@ -304,11 +304,12 @@ export const GRUPO_POBLACIONAL = [
   { id: 2, label: 'Infancia (6-11 años)' },
   { id: 3, label: 'Adolescencia (12-17 años)' },
   { id: 4, label: 'Juventud (18-28 años)' },
-  { id: 5, label: 'Gestante' },
+  { id: 5, label: 'Adultez (29-59 años)' },
   { id: 6, label: 'Adulto mayor (60+ años)' },
-  { id: 7, label: 'Con discapacidad' },
-  { id: 8, label: 'Víctima de violencia' },
-  { id: 9, label: 'Persona en situación de calle' },
+  { id: 7, label: 'Gestante' },
+  { id: 8, label: 'Con discapacidad' },
+  { id: 9, label: 'Víctima de violencia' },
+  { id: 10, label: 'Persona en situación de calle' },
 ]
 
 export const DISCAPACIDADES = [
@@ -320,6 +321,7 @@ export const DISCAPACIDADES = [
   { id: 6, label: 'Psicosocial / Mental' },
   { id: 7, label: 'Sistémica / Visceral' },
   { id: 8, label: 'Múltiple' },
+  { id: 9, label: 'Ninguna de las anteriores' },
 ]
 
 // ---- SALUD ----
@@ -347,14 +349,15 @@ export const ANTECEDENTES_TRANSMISIBLES = [
 
 export const INTERVENCIONES_PENDIENTES = [
   { id: 1, label: 'Vacunación (esquema atrasado)' },
-  { id: 2, label: 'Tamizaje de cáncer (citología, mama, próstata)' },
-  { id: 3, label: 'Planificación familiar' },
-  { id: 4, label: 'Control prenatal' },
-  { id: 5, label: 'Control de crecimiento y desarrollo' },
-  { id: 6, label: 'Control de enfermedades crónicas' },
-  { id: 7, label: 'Atención en salud oral' },
-  { id: 8, label: 'Salud visual (optometría)' },
-  { id: 9, label: 'Atención en salud mental' },
+  { id: 2, label: 'Tamizaje de cáncer' },
+  { id: 3, label: 'Citologías' },
+  { id: 4, label: 'Mamografías' },
+  { id: 5, label: 'Próstata' },
+  { id: 6, label: 'Planificación familiar' },
+  { id: 7, label: 'Control prenatal' },
+  { id: 8, label: 'Control de crecimiento y desarrollo' },
+  { id: 9, label: 'Control de enfermedades crónicas' },
+  { id: 10, label: 'Atención en salud oral' },
 ]
 
 export const REMISIONES_APS = [
@@ -375,6 +378,7 @@ export const DIAGNOSTICO_NUTRICIONAL = [
   { id: 4, label: 'Riesgo de Desnutrición' },
   { id: 5, label: 'Desnutrición Aguda' },
   { id: 6, label: 'Desnutrición Crónica / Severa' },
+  { id: 7, label: 'No aplica' },
 ]
 
 export const PERFIL_ENCUESTADOR = [

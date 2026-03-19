@@ -45,10 +45,10 @@ export default function HomePage() {
           <Activity className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight" style={{ color: '#081e69' }}>
-          SIS‑APS 2026
+          SI‑APS
         </h1>
         <p className="text-slate-500 max-w-sm mx-auto text-sm">
-          Sistema de Atención Primaria en Salud — Pereira
+          Sistema para control interno de las identificaciones
         </p>
       </div>
 
@@ -144,7 +144,7 @@ export default function HomePage() {
       </div>
 
       <p className="mt-8 text-xs text-slate-400 text-center font-medium">
-        ESE Salud Pereira · Ministerio de Salud y Protección Social · 2026
+        © 2026 | Desarrollado por Juan Taguado para APS Pereira
       </p>
     </div>
   )

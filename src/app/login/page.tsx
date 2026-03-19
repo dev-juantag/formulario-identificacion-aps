@@ -65,11 +65,11 @@ export default function LoginPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a8c32] to-[#044c1a] text-white shadow-2xl shadow-emerald-900/50 mb-6 border border-emerald-400/20">
             <LogIn size={28} />
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
-            Entorno SI-APS
+          <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-sm">
+            ADMINISTRACIÓN SI-APS
           </h1>
           <p className="mt-2 text-sm font-medium text-blue-200/60 leading-relaxed max-w-[250px] mx-auto">
-            Sistema de Identificación Poblacional y Territorial
+            Sistema para control interno de las identificaciones
           </p>
         </div>
 
@@ -127,7 +127,7 @@ export default function LoginPage() {
         </form>
         
         <p className="text-center text-[10px] text-blue-300/30 uppercase tracking-[0.2em] font-black pb-10">
-          ESE Salud Institucional — 2026
+          © 2026 | Desarrollado por Juan Taguado para APS Pereira
         </p>
       </div>
     </div>
