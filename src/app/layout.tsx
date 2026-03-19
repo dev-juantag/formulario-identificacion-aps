@@ -8,6 +8,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'SI-APS | Identificación Poblacional',
   description: 'Sistema de Atención Primaria en Salud — Caracterización Poblacional — ESE Salud Pereira',
+  icons: {
+    icon: '/icon.svg',
+    apple: '/icon.svg',
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

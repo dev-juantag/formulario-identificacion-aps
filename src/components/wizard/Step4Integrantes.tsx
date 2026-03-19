@@ -24,7 +24,7 @@ const defaultIntegrante = {
 }
 
 export default function Step4Integrantes() {
-  const { register, control, watch } = useFormContext()
+  const { register, control, watch, setValue } = useFormContext()
   const { fields, append, remove } = useFieldArray({ control, name: 'integrantes' })
   const [expanded, setExpanded] = useState<number[]>([0])
 
@@ -99,17 +99,17 @@ export default function Step4Integrantes() {
               <div className="p-4 space-y-4 bg-white">
                 {/* Datos básicos */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <F label="Primer Nombre" required><input {...register(`integrantes.${i}.primerNombre`)} className={inp} /></F>
-                  <F label="Segundo Nombre"><input {...register(`integrantes.${i}.segundoNombre`)} className={inp} /></F>
-                  <F label="Primer Apellido" required><input {...register(`integrantes.${i}.primerApellido`)} className={inp} /></F>
-                  <F label="Segundo Apellido" required><input {...register(`integrantes.${i}.segundoApellido`)} className={inp} /></F>
+                  <F label="Primer Nombre" required><input {...register(`integrantes.${i}.primerNombre`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/\b\w/g, c => c.toUpperCase()); register(`integrantes.${i}.primerNombre`).onChange(e); }} className={inp} /></F>
+                  <F label="Segundo Nombre"><input {...register(`integrantes.${i}.segundoNombre`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/\b\w/g, c => c.toUpperCase()); register(`integrantes.${i}.segundoNombre`).onChange(e); }} className={inp} /></F>
+                  <F label="Primer Apellido" required><input {...register(`integrantes.${i}.primerApellido`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/\b\w/g, c => c.toUpperCase()); register(`integrantes.${i}.primerApellido`).onChange(e); }} className={inp} /></F>
+                  <F label="Segundo Apellido" required><input {...register(`integrantes.${i}.segundoApellido`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/\b\w/g, c => c.toUpperCase()); register(`integrantes.${i}.segundoApellido`).onChange(e); }} className={inp} /></F>
                   <F label="Tipo Doc." required>
                     <select {...register(`integrantes.${i}.tipoDoc`)} className={sel}>
                       <option value="">— Selecciona —</option>
                       {TIPO_DOCUMENTO.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
                     </select>
                   </F>
-                  <F label="N° Documento" required><input {...register(`integrantes.${i}.numDoc`)} className={inp} /></F>
+                  <F label="N° Documento" required><input {...register(`integrantes.${i}.numDoc`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); register(`integrantes.${i}.numDoc`).onChange(e); }} minLength={7} className={inp} /></F>
                   <F label="Fecha de Nacimiento" required>
                     <input type="date" {...register(`integrantes.${i}.fechaNacimiento`)} className={inp} />
                   </F>
@@ -129,16 +129,16 @@ export default function Step4Integrantes() {
                     </select>
                   </F>
                   <F label="Sexo" required>
-                    <select {...register(`integrantes.${i}.sexo`)} className={sel}>
+                    <select {...register(`integrantes.${i}.sexo`)} onChange={(e) => { register(`integrantes.${i}.sexo`).onChange(e); if (e.target.value === 'HOMBRE') setValue(`integrantes.${i}.gestante`, 'NA'); }} className={sel}>
                       <option value="">— Selecciona —</option>
                       {SEXO.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
                     </select>
                   </F>
                   <F label="Gestante">
                     <select {...register(`integrantes.${i}.gestante` as const)} className={sel}>
-                      {sexo === '1' ? (
+                      {sexo === 'HOMBRE' ? (
                         <option value="NA">NO APLICA</option>
-                      ) : sexo === '3' ? (
+                      ) : sexo === 'INDETERMINADO' ? (
                         <>
                           <option value="NA">NO APLICA</option>
                           <option value="SI">Sí</option>
@@ -150,12 +150,13 @@ export default function Step4Integrantes() {
                           <option value="SI">Sí</option>
                           <option value="NO">No</option>
                           <option value="En duda">En duda</option>
+                          <option value="NA">Ninguno / NA</option>
                         </>
                       )}
                     </select>
                   </F>
                   <F label="Teléfono" required>
-                    <input type="tel" {...register(`integrantes.${i}.telefono`)} className={inp} placeholder="3XX XXX XXXX" />
+                    <input type="tel" {...register(`integrantes.${i}.telefono`)} onInput={(e) => { let val = e.currentTarget.value.replace(/[^0-9]/g, ''); if (val.length > 0 && val[0] !== '3') val = '3' + val.substring(1); if (val.length > 10) val = val.substring(0, 10); e.currentTarget.value = val; register(`integrantes.${i}.telefono`).onChange(e); }} minLength={10} maxLength={10} className={inp} placeholder="3XX XXX XXXX" />
                   </F>
                 </div>
 

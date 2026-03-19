@@ -18,6 +18,7 @@ type FichaDTO = {
   estratoSocial: number | null;
   numEBS: string | null;
   numHogar: string | null;
+  observacionesRechazo?: string | null;
   encuestador: { nombre: string | null; apellidos: string | null; documento: string } | null;
   _count: { integrantes: number };
 }
@@ -241,11 +242,23 @@ export default function FichasDatabase() {
                     </td>
                     <td className="py-4 px-6 whitespace-nowrap">
                       {translateEstado(f.estadoVisita)}
+                      {(f.estadoVisita === '3' || f.estadoVisita === '2') && f.observacionesRechazo && (
+                        <div className="mt-1 text-[10px] text-slate-500 max-w-[150px] whitespace-normal">
+                          <span className="font-semibold">Nota:</span> {f.observacionesRechazo}
+                        </div>
+                      )}
                     </td>
                     <td className="py-4 px-6">
-                      <div className="flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
-                        <MapPin className="w-4 h-4 text-slate-400" />
-                        {f.territorio} <span className="text-slate-400">|</span> {f.microterritorio}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
+                          <MapPin className="w-4 h-4 text-slate-400" />
+                          {f.territorio} <span className="text-slate-400">|</span> {f.microterritorio}
+                        </div>
+                        {f.descripcionUbicacion && (
+                          <div className="text-[10px] text-slate-400 max-w-[200px] whitespace-normal leading-tight">
+                            {f.descripcionUbicacion}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="py-4 px-6">

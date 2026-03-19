@@ -56,7 +56,7 @@ export async function GET(req: Request) {
   }
   if (qCreador) {
     whereOptions.encuestador = { 
-      is: { documento: qCreador } 
+      documento: { contains: qCreador } 
     }
   }
 
@@ -67,6 +67,7 @@ export async function GET(req: Request) {
          id: true,
          consecutivo: true,
          estadoVisita: true,
+         observacionesRechazo: true,
          direccion: true,
          // @ts-ignore - Supress outdated local TS cache
          centroPoblado: true,

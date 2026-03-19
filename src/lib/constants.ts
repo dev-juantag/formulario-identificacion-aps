@@ -214,6 +214,7 @@ export const VULNERABILIDADES = [
   { id: 'vif', label: 'Violencia intrafamiliar' },
   { id: 'spa', label: 'Consumo de sustancias psicoactivas (SPA)' },
   { id: 'trabajo_infantil', label: 'Trabajo infantil' },
+  { id: 'ninguno', label: 'Ninguno' },
 ]
 
 // ---- INTEGRANTES ----
@@ -310,6 +311,7 @@ export const GRUPO_POBLACIONAL = [
   { id: 8, label: 'Con discapacidad' },
   { id: 9, label: 'Víctima de violencia' },
   { id: 10, label: 'Persona en situación de calle' },
+  { id: 11, label: 'Ninguno' },
 ]
 
 export const DISCAPACIDADES = [
