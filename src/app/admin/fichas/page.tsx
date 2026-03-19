@@ -262,11 +262,6 @@ export default function FichasDatabase() {
                           <MapPin className="w-4 h-4 text-slate-400" />
                           {f.territorio} <span className="text-slate-400">|</span> {f.microterritorio}
                         </div>
-                        {f.descripcionUbicacion && (
-                          <div className="text-[10px] text-slate-400 max-w-[200px] whitespace-normal leading-tight">
-                            {f.descripcionUbicacion}
-                          </div>
-                        )}
                       </div>
                     </td>
                     <td className="py-4 px-6">
