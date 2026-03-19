@@ -10,6 +10,8 @@ interface FichaResumen {
   consecutivo: number
   direccion: string
   numDocEncuestador?: string
+  encuestador?: { nombre: string; apellidos: string; documento: string }
+  estadoVisita: string
   createdAt: string
   integrantes: { numDoc: string; primerNombre: string; primerApellido: string }[]
 }
@@ -22,6 +24,7 @@ export default function TerritoryPage() {
   const microterritorio = searchParams.get('micro') || ''
 
   const [cedula, setCedula] = useState('')
+  const [estado, setEstado] = useState('')
   const [fichas, setFichas] = useState<FichaResumen[]>([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
@@ -36,6 +39,7 @@ export default function TerritoryPage() {
     try {
       const params = new URLSearchParams({ territorio })
       if (cedula.trim()) params.set('cedula', cedula.trim())
+      if (estado) params.set('estado', estado)
       const res = await fetch(`/api/survey/buscar?${params}`)
       const data = await res.json()
       setFichas(data.fichas || [])
@@ -95,10 +99,20 @@ export default function TerritoryPage() {
               value={cedula}
               onChange={(e) => setCedula(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleBuscar()}
-              placeholder="Buscar por número de cédula..."
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#076b26]/50 transition-all"
+              placeholder="Buscar por documento de creador..."
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#076b26]/50 transition-all text-sm"
             />
           </div>
+          <select
+            value={estado}
+            onChange={(e) => setEstado(e.target.value)}
+            className="px-4 py-3 border border-slate-200 rounded-xl text-sm font-semibold bg-white outline-none focus:ring-2 focus:ring-[#076b26]/50 shadow-sm"
+          >
+            <option value="">Todas</option>
+            <option value="1">Efectivas</option>
+            <option value="2">No Efectivas</option>
+            <option value="3">Rechazadas</option>
+          </select>
           <button
             onClick={handleBuscar}
             disabled={loading}
@@ -148,30 +162,45 @@ export default function TerritoryPage() {
               className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
               onClick={() => router.push(`/survey/${territorio}/${ficha.id}`)}
             >
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[#076b26] text-xs font-bold px-2 py-1 rounded-lg" style={{ background: '#076b2615' }}>
                       #{ficha.consecutivo}
                     </span>
-                    <span className="text-sm text-slate-500">{ficha.direccion}</span>
+                    {ficha.estadoVisita === '1' && <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-1 rounded-full tracking-wider">Efectiva</span>}
+                    {ficha.estadoVisita === '2' && <span className="bg-orange-100 text-orange-700 text-[10px] font-black uppercase px-2 py-1 rounded-full tracking-wider">No Efectiva</span>}
+                    {ficha.estadoVisita === '3' && <span className="bg-red-100 text-red-700 text-[10px] font-black uppercase px-2 py-1 rounded-full tracking-wider">Rechazada</span>}
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[#076b26] transition-colors flex-shrink-0" />
+                </div>
+                
+                <p className="text-sm text-slate-700 font-semibold">{ficha.direccion}</p>
+                
+                {ficha.integrantes && ficha.integrantes.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-1">
                     {ficha.integrantes.slice(0, 3).map((int, i) => (
-                      <span key={i} className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+                      <span key={i} className="flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
                         <User className="w-3 h-3" />
-                        {int.primerNombre} {int.primerApellido} · {int.numDoc}
+                        {int.primerNombre} {int.primerApellido}
                       </span>
                     ))}
                     {ficha.integrantes.length > 3 && (
-                      <span className="text-xs text-slate-400">+{ficha.integrantes.length - 3} más</span>
+                      <span className="text-[11px] text-slate-400">+{ficha.integrantes.length - 3}</span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400">
-                    {new Date(ficha.createdAt).toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })}
-                  </p>
+                )}
+                
+                <div className="flex items-end justify-between border-t border-slate-100 pt-3 mt-1">
+                  <div className="text-[10px] text-slate-500 flex flex-col gap-0.5">
+                    <p className="font-bold text-slate-700 uppercase tracking-widest text-[9px]">Creador</p>
+                    <p>{ficha.encuestador ? `${ficha.encuestador.nombre} ${ficha.encuestador.apellidos}` : (ficha.numDocEncuestador || 'Público')}</p>
+                  </div>
+                  <div className="text-[10px] text-slate-400 text-right">
+                    <p className="font-medium text-slate-600">{new Date(ficha.createdAt).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                    <p>{new Date(ficha.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</p>
+                  </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[#076b26] transition-colors flex-shrink-0 mt-2" />
               </div>
             </div>
           ))}

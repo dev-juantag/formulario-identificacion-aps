@@ -21,10 +21,25 @@ export const useGeolocation = () => {
         setLoading(false)
       },
       (err) => {
-        setError('No se pudo capturar la ubicación. Verifique los permisos.')
-        setLoading(false)
+        if (err.code === err.TIMEOUT) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+              setError(null)
+              setLoading(false)
+            },
+            (err2) => {
+              setError(`Reintento fallido: ${err2.message}`)
+              setLoading(false)
+            },
+            { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
+          )
+        } else {
+          setError(`Error ubicación (${err.code}): ${err.message}`)
+          setLoading(false)
+        }
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     )
   }, [])
 

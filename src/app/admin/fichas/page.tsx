@@ -188,26 +188,26 @@ export default function FichasDatabase() {
           <input 
             type="text" 
             placeholder="N° Hogar" 
-            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-white dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[120px]" 
+            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-slate-800 text-white border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[120px] placeholder:text-slate-400" 
             value={qHogar} 
             onChange={e => setQHogar(e.target.value)} 
           />
           <input 
             type="text" 
             placeholder="Familia ID" 
-            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-white dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[120px]" 
+            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-slate-800 text-white border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[120px] placeholder:text-slate-400" 
             value={qFamilia} 
             onChange={e => setQFamilia(e.target.value)} 
           />
           <input 
             type="text" 
             placeholder="Documento Creador (CC)" 
-            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-white dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[200px]" 
+            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-slate-800 text-white border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[200px] placeholder:text-slate-400" 
             value={qCreador} 
             onChange={e => setQCreador(e.target.value)} 
           />
           <select 
-            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-white dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[140px]"
+            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-slate-800 text-white border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[140px]"
             value={qEstado}
             onChange={e => setQEstado(e.target.value)}
           >
