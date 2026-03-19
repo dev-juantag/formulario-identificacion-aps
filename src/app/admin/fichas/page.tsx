@@ -18,6 +18,7 @@ type FichaDTO = {
   estratoSocial: number | null;
   numEBS: string | null;
   numHogar: string | null;
+  numDocEncuestador: string | null;
   observacionesRechazo?: string | null;
   encuestador: { nombre: string | null; apellidos: string | null; documento: string } | null;
   _count: { integrantes: number };
@@ -36,6 +37,7 @@ export default function FichasDatabase() {
   const [qHogar, setQHogar] = useState('')
   const [qFamilia, setQFamilia] = useState('')
   const [qCreador, setQCreador] = useState('')
+  const [qEstado, setQEstado] = useState('')
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -62,6 +64,7 @@ export default function FichasDatabase() {
       if (qHogar) qParams.append('hogar', qHogar)
       if (qFamilia) qParams.append('familia', qFamilia)
       if (qCreador) qParams.append('creador', qCreador)
+      if (qEstado) qParams.append('estado', qEstado)
 
       const res = await fetch(`/api/admin/fichas?${qParams.toString()}`)
       if (res.ok) setFichas(await res.json())
@@ -203,6 +206,16 @@ export default function FichasDatabase() {
             value={qCreador} 
             onChange={e => setQCreador(e.target.value)} 
           />
+          <select 
+            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-white dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[140px]"
+            value={qEstado}
+            onChange={e => setQEstado(e.target.value)}
+          >
+            <option value="">Todas</option>
+            <option value="1">Efectivas</option>
+            <option value="2">No Efectivas</option>
+            <option value="3">Rechazadas / Negadas</option>
+          </select>
           <button 
             onClick={fetchFichas} 
             className="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-all shadow-md active:scale-95 text-sm ml-auto sm:ml-0"
@@ -229,7 +242,7 @@ export default function FichasDatabase() {
                   <th className="font-bold py-4 px-6 border-b border-slate-100 dark:border-slate-800">Estado</th>
                   <th className="font-bold py-4 px-6 border-b border-slate-100 dark:border-slate-800">Ubicación</th>
                   <th className="font-bold py-4 px-6 border-b border-slate-100 dark:border-slate-800">Integrantes</th>
-                  <th className="font-bold py-4 px-6 border-b border-slate-100 dark:border-slate-800">Encuestador</th>
+                  <th className="font-bold py-4 px-6 border-b border-slate-100 dark:border-slate-800">Encuestador (número de documento)</th>
                   <th className="font-bold py-4 px-6 border-b border-slate-100 dark:border-slate-800">Fecha Creada</th>
                   <th className="font-bold py-4 px-6 border-b border-slate-100 dark:border-slate-800 text-right">Opciones</th>
                 </tr>
@@ -242,11 +255,6 @@ export default function FichasDatabase() {
                     </td>
                     <td className="py-4 px-6 whitespace-nowrap">
                       {translateEstado(f.estadoVisita)}
-                      {(f.estadoVisita === '3' || f.estadoVisita === '2') && f.observacionesRechazo && (
-                        <div className="mt-1 text-[10px] text-slate-500 max-w-[150px] whitespace-normal">
-                          <span className="font-semibold">Nota:</span> {f.observacionesRechazo}
-                        </div>
-                      )}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex flex-col gap-1">
@@ -271,7 +279,9 @@ export default function FichasDatabase() {
                       <div className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate max-w-[150px]">
                         {f.encuestador ? `${f.encuestador.nombre || ''} ${f.encuestador.apellidos || ''}` : <span className="text-slate-400">Público</span>}
                       </div>
-                      {f.encuestador && <div className="text-[10px] text-slate-400">{f.encuestador.documento}</div>}
+                      <div className="text-[10px] text-slate-400">
+                        {f.encuestador ? f.encuestador.documento : (f.numDocEncuestador || '')}
+                      </div>
                     </td>
                     <td className="py-4 px-6 whitespace-nowrap">
                       <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">

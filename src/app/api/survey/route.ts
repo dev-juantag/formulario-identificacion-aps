@@ -20,6 +20,7 @@ export async function POST(req: Request) {
       microterritorio: String(microterritorio || 'M1'),
       uzpe: hogarData.uzpe || null,
       centroPoblado: hogarData.centroPoblado || null,
+      descripcionUbicacion: hogarData.descripcionUbicacion || null,
       direccion: String(hogarData.direccion || ''),
       latitud: hogarData.coords?.lat ? parseFloat(hogarData.coords.lat) : null,
       longitud: hogarData.coords?.lng ? parseFloat(hogarData.coords.lng) : null,

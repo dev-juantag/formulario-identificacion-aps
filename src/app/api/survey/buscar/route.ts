@@ -19,9 +19,10 @@ export async function GET(req: Request) {
       where: {
         territorio,
         ...(cedula ? {
-          integrantes: {
-            some: { numDoc: { contains: cedula } }
-          }
+          OR: [
+            { numDocEncuestador: { contains: cedula } },
+            { encuestador: { documento: { contains: cedula } } }
+          ]
         } : {})
       },
       include: {

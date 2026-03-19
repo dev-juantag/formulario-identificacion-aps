@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { TERRITORIOS, MICROTERRITORIOS } from '@/lib/constants'
-import { MapPin, ChevronRight, Activity, ShieldCheck, Lock } from 'lucide-react'
+import { MapPin, ChevronRight, Activity, ShieldCheck, Lock, HeartPulse } from 'lucide-react'
 
 export default function HomePage() {
   // ... (previous state and logic)
@@ -40,9 +40,9 @@ export default function HomePage() {
       <div className="text-center mb-8 space-y-3">
         <div
           className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-4 shadow-2xl"
-          style={{ background: 'linear-gradient(135deg, #081e69, #0f2d99)' }}
+          style={{ background: 'linear-gradient(135deg, #096246, #097d2d)' }}
         >
-          <Activity className="w-10 h-10 text-white" />
+          <HeartPulse className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight" style={{ color: '#081e69' }}>
           SI‑APS

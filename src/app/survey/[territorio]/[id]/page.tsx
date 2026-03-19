@@ -99,6 +99,19 @@ export default async function FichaResumenPage({
       {/* ── Content ── */}
       <main className="max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6 mt-4">
         
+        {/* Rejected Note */}
+        {(f.estadoVisita === '2' || f.estadoVisita === '3') ? (
+          <div className="bg-red-50 border border-red-200 rounded-3xl p-6 shadow-sm mb-2">
+            <h2 className="text-lg font-bold text-red-800 flex items-center gap-2">
+              <Info className="w-5 h-5" />
+              Motivo de Rechazo / No Efectividad
+            </h2>
+            <p className="mt-2 text-red-700 font-medium">
+              {f.observacionesRechazo || 'Sin nota de rechazo proporcionada'}
+            </p>
+          </div>
+        ) : null}
+        
         {/* Ficha & Ubicacion */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-3xl p-7 shadow-sm border border-slate-100 flex flex-col gap-4">

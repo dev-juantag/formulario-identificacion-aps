@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     const fichas = await prisma.fichaHogar.findMany({
+      where: { estadoVisita: '1' },
       include: { integrantes: true },
       orderBy: { consecutivo: 'asc' },
     })

@@ -45,9 +45,13 @@ export async function GET(req: Request) {
   const qHogar = searchParams.get('hogar')
   const qFamilia = searchParams.get('familia')
   const qCreador = searchParams.get('creador')
+  const qEstado = searchParams.get('estado')
 
   const whereOptions: any = {}
 
+  if (qEstado) {
+    whereOptions.estadoVisita = qEstado
+  }
   if (qHogar) {
     whereOptions.numHogar = { contains: qHogar }
   }
@@ -55,9 +59,10 @@ export async function GET(req: Request) {
     whereOptions.numFamilia = { contains: qFamilia }
   }
   if (qCreador) {
-    whereOptions.encuestador = { 
-      documento: { contains: qCreador } 
-    }
+    whereOptions.OR = [
+      { encuestador: { documento: { contains: qCreador } } },
+      { numDocEncuestador: { contains: qCreador } }
+    ]
   }
 
   try {
@@ -81,6 +86,7 @@ export async function GET(req: Request) {
          encuestador: {
              select: { nombre: true, apellidos: true, documento: true }
          },
+         numDocEncuestador: true,
          // Conteo para mostrar la escala
          _count: {
              select: { integrantes: true }
