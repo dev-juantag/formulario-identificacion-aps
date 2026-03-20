@@ -125,6 +125,10 @@ export default function Step5Salud() {
                       <input type="checkbox" {...register(`integrantes.${i}.esquemaAtenciones`)} className={chk} />
                       <span className="text-xs">¿Cumple esquema de atenciones de P&M?</span>
                     </label>
+                    <label className={chkLabel}>
+                      <input type="checkbox" {...register(`integrantes.${i}.esquemaVacunacion`)} className={chk} />
+                      <span className="text-xs">¿Cumple esquema de vacunación?</span>
+                    </label>
                   </div>
                 </FS>
 

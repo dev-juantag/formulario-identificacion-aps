@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { ArrowLeft, Home, MapPin, Users, Calendar, Activity, Info, Building2 } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import ExportPdfButton from '@/components/ExportPdfButton'
+import FacturaFicha from '@/components/ui/FacturaFicha'
+import PrintButton from '@/components/ui/PrintButton'
 
 const prisma = new PrismaClient()
 
@@ -62,19 +64,24 @@ export default async function FichaResumenPage({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f8fc] pb-12">
+    <div className="flex flex-col min-h-screen bg-[#f7f8fc] pb-12 print:bg-white">
       {isSuccess && (
-        <div className="no-print mt-6 mb-8 bg-emerald-50 border-l-4 border-emerald-500 py-6 px-8 rounded-r-3xl rounded-b-3xl shadow-lg border-b border-emerald-100 flex flex-col sm:flex-row gap-6 justify-between items-center sm:items-start" style={{ marginLeft: '-1px' }}>
+        <div className="print:hidden mt-6 mb-8 bg-emerald-50 border-l-4 border-emerald-500 py-6 px-8 rounded-r-3xl rounded-b-3xl shadow-lg border-b border-emerald-100 flex flex-col sm:flex-row gap-6 justify-between items-center sm:items-start" style={{ marginLeft: '-1px' }}>
           <div>
              <h2 className="text-2xl font-black text-emerald-800 tracking-tight leading-tight">¡Identificación guardada!</h2>
              <p className="font-semibold text-emerald-600/90 mt-1">Los datos han sido registrados exitosamente en el sistema.</p>
           </div>
-          <ExportPdfButton />
+          <div className="flex gap-3">
+             <ExportPdfButton />
+          </div>
         </div>
       )}
 
+      {/* ── Componente Oculto de Impresión Estilo Factura ── */}
+      <FacturaFicha ficha={f} autoPrint={isSuccess /* or we use PrintButton autoPrint logic */} />
+
       {/* ── Header ── */}
-      <header className="px-6 py-5 flex items-center justify-between shadow-md relative z-10" style={{ backgroundColor: '#081e69' }}>
+      <header className="print:hidden px-6 py-5 flex items-center justify-between shadow-md relative z-10" style={{ backgroundColor: '#081e69' }}>
         <div className="flex items-center gap-4">
           <Link
             href={`/survey/${resolvedParams.territorio}?micro=${f.microterritorio}`}
@@ -91,13 +98,14 @@ export default async function FichaResumenPage({
             </p>
           </div>
         </div>
-        <div className="hidden sm:block">
+        <div className="hidden sm:flex items-center gap-4 print:hidden">
+          <PrintButton />
           {getEstado(f.estadoVisita)}
         </div>
       </header>
 
       {/* ── Content ── */}
-      <main className="max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6 mt-4">
+      <main className="print:hidden max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6 mt-4">
         
         {/* Rejected Note */}
         {(f.estadoVisita === '2' || f.estadoVisita === '3') ? (

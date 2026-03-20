@@ -11,7 +11,7 @@ import { inp, sel, lbl, lblStyle, required as reqStyle, chk, chkLabel, btnGreen,
 
 const defaultIntegrante = {
   primerNombre: '', segundoNombre: '', primerApellido: '', segundoApellido: '',
-  tipoDoc: 'CC', numDoc: '', fechaNacimiento: '', parentesco: '', sexo: '', gestante: 'NA',
+  tipoDoc: 'CC', numDoc: '', fechaNacimiento: '', parentesco: '', sexo: '', gestante: 'NA', mesesGestacion: '',
   telefono: '', nivelEducativo: '', ocupacion: '', regimen: '', eapb: '',
   etnia: '', puebloIndigena: '', grupoPoblacional: [] as number[], discapacidades: [] as number[],
   antecedentes: {} as Record<string, boolean>,
@@ -51,6 +51,7 @@ export default function Step4Integrantes() {
         const cursoVida = edad !== null ? calcularCursoVida(edad) : ''
         const etnia = watch(`integrantes.${i}.etnia`)
         const sexo = watch(`integrantes.${i}.sexo`)
+        const gestanteStatus = watch(`integrantes.${i}.gestante`)
         const open = expanded.includes(i)
 
         return (
@@ -99,10 +100,10 @@ export default function Step4Integrantes() {
               <div className="p-4 space-y-4 bg-white">
                 {/* Datos básicos */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <F label="Primer Nombre" required><input {...register(`integrantes.${i}.primerNombre`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/\b\w/g, c => c.toUpperCase()); register(`integrantes.${i}.primerNombre`).onChange(e); }} className={inp} /></F>
-                  <F label="Segundo Nombre"><input {...register(`integrantes.${i}.segundoNombre`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/\b\w/g, c => c.toUpperCase()); register(`integrantes.${i}.segundoNombre`).onChange(e); }} className={inp} /></F>
-                  <F label="Primer Apellido" required><input {...register(`integrantes.${i}.primerApellido`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/\b\w/g, c => c.toUpperCase()); register(`integrantes.${i}.primerApellido`).onChange(e); }} className={inp} /></F>
-                  <F label="Segundo Apellido" required><input {...register(`integrantes.${i}.segundoApellido`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/\b\w/g, c => c.toUpperCase()); register(`integrantes.${i}.segundoApellido`).onChange(e); }} className={inp} /></F>
+                  <F label="Primer Nombre" required><input {...register(`integrantes.${i}.primerNombre`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/(^|\s)\S/g, c => c.toUpperCase()); register(`integrantes.${i}.primerNombre`).onChange(e); }} className={inp} /></F>
+                  <F label="Segundo Nombre"><input {...register(`integrantes.${i}.segundoNombre`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/(^|\s)\S/g, c => c.toUpperCase()); register(`integrantes.${i}.segundoNombre`).onChange(e); }} className={inp} /></F>
+                  <F label="Primer Apellido" required><input {...register(`integrantes.${i}.primerApellido`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/(^|\s)\S/g, c => c.toUpperCase()); register(`integrantes.${i}.primerApellido`).onChange(e); }} className={inp} /></F>
+                  <F label="Segundo Apellido" required><input {...register(`integrantes.${i}.segundoApellido`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '').replace(/(^|\s)\S/g, c => c.toUpperCase()); register(`integrantes.${i}.segundoApellido`).onChange(e); }} className={inp} /></F>
                   <F label="Tipo Doc." required>
                     <select {...register(`integrantes.${i}.tipoDoc`)} className={sel}>
                       <option value="">— Selecciona —</option>
@@ -111,7 +112,7 @@ export default function Step4Integrantes() {
                   </F>
                   <F label="N° Documento" required><input {...register(`integrantes.${i}.numDoc`)} onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); register(`integrantes.${i}.numDoc`).onChange(e); }} minLength={7} className={inp} /></F>
                   <F label="Fecha de Nacimiento" required>
-                    <input type="date" {...register(`integrantes.${i}.fechaNacimiento`)} className={inp} />
+                    <input type="date" min={new Date(new Date().setFullYear(new Date().getFullYear() - 100)).toISOString().split('T')[0]} max={new Date().toISOString().split('T')[0]} {...register(`integrantes.${i}.fechaNacimiento`)} className={inp} />
                   </F>
                   <F label="Edad y Curso de Vida">
                     <input
@@ -135,7 +136,7 @@ export default function Step4Integrantes() {
                     </select>
                   </F>
                   <F label="Gestante">
-                    <select {...register(`integrantes.${i}.gestante` as const)} className={sel}>
+                    <select {...register(`integrantes.${i}.gestante` as const)} onChange={(e) => { register(`integrantes.${i}.gestante`).onChange(e); if (e.target.value !== 'SI') setValue(`integrantes.${i}.mesesGestacion`, null); }} className={sel}>
                       {sexo === 'HOMBRE' ? (
                         <option value="NA">NO APLICA</option>
                       ) : sexo === 'INDETERMINADO' ? (
@@ -150,11 +151,20 @@ export default function Step4Integrantes() {
                           <option value="SI">Sí</option>
                           <option value="NO">No</option>
                           <option value="En duda">En duda</option>
-                          <option value="NA">Ninguno / NA</option>
                         </>
                       )}
                     </select>
                   </F>
+                  {gestanteStatus === 'SI' && (
+                    <F label="Meses de Gestante" required>
+                      <select {...register(`integrantes.${i}.mesesGestacion`, { valueAsNumber: true })} className={sel}>
+                        <option value="">— Selecciona —</option>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(m => (
+                          <option key={m} value={m}>{m} {m === 1 ? 'mes' : 'meses'}</option>
+                        ))}
+                      </select>
+                    </F>
+                  )}
                   <F label="Teléfono" required>
                     <input type="tel" {...register(`integrantes.${i}.telefono`)} onInput={(e) => { let val = e.currentTarget.value.replace(/[^0-9]/g, ''); if (val.length > 0 && val[0] !== '3') val = '3' + val.substring(1); if (val.length > 10) val = val.substring(0, 10); e.currentTarget.value = val; register(`integrantes.${i}.telefono`).onChange(e); }} minLength={10} maxLength={10} className={inp} placeholder="3XX XXX XXXX" />
                   </F>

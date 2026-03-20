@@ -47,16 +47,16 @@ export default function Step2Vivienda() {
     
       {/* Identificadores Matrioshka */}
       <div className={card} style={cardBorder}>
-        <p className={sectionTitle} style={sectionTitleStyle}>Códigos de Identificación</p>
+        <p className={sectionTitle} style={sectionTitleStyle}>Códigos de Identificación (Autogenerados)</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <F label="ID Hogar (Casa)" required>
-            <input {...register('numHogar')} className={inp} placeholder={`${numEBS}H0001`} />
+            <input {...register('numHogar')} className={`${inp} transition-colors focus:ring-2 focus:ring-emerald-500`} placeholder={`${numEBS || ''}H0001`} />
           </F>
           <F label="ID Familia" required>
-            <input {...register('numFamilia')} className={inp} placeholder={`...F0001`} />
+            <input {...register('numFamilia')} className={`${inp} transition-colors focus:ring-2 focus:ring-emerald-500`} placeholder={`...F0001`} />
           </F>
           <F label="Código Ficha" required>
-            <input {...register('codFicha')} className={inp} placeholder={`...CF001`} />
+            <input {...register('codFicha')} className={`${inp} transition-colors focus:ring-2 focus:ring-emerald-500`} placeholder={`...CF001`} />
           </F>
         </div>
       </div>

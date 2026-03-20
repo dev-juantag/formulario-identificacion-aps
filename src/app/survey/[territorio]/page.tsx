@@ -99,7 +99,7 @@ export default function TerritoryPage() {
               value={cedula}
               onChange={(e) => setCedula(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleBuscar()}
-              placeholder="Buscar por documento de creador..."
+              placeholder="Buscar por documento de integrante, documento creador, dirección..."
               className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#076b26]/50 transition-all text-sm"
             />
           </div>

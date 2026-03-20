@@ -21,7 +21,10 @@ export async function GET(req: Request) {
     if (cedula) {
       whereObj.OR = [
         { numDocEncuestador: { contains: cedula } },
-        { encuestador: { documento: { contains: cedula } } }
+        { encuestador: { documento: { contains: cedula } } },
+        { direccion: { contains: cedula, mode: 'insensitive' } },
+        { integrantes: { some: { numDoc: { contains: cedula } } } },
+        { codFicha: { contains: cedula, mode: 'insensitive' } } // Bonus: Allow searching by code
       ]
     }
 

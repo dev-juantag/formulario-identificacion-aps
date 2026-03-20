@@ -201,8 +201,9 @@ export default function FichasDatabase() {
           />
           <input 
             type="text" 
-            placeholder="Documento Creador (CC)" 
-            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-slate-800 text-white border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[200px] placeholder:text-slate-400" 
+            title="Buscar por documento de integrante, documento creador, dirección o código de ficha..."
+            placeholder="Doc Integrante / Creador / Dirección" 
+            className="px-4 py-2.5 border rounded-xl text-sm font-semibold bg-slate-800 text-white border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[300px] placeholder:text-slate-400" 
             value={qCreador} 
             onChange={e => setQCreador(e.target.value)} 
           />

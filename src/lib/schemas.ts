@@ -8,22 +8,31 @@ export const integranteSchema = z.object({
   primerNombre: z.string()
     .min(1, 'Requerido')
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, 'Solo letras')
-    .transform(v => v.trim().toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase())),
+    .transform(v => v.trim().toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase())),
   segundoNombre: z.string().optional().nullable()
-    .transform(v => v ? v.trim().toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase()) : v),
+    .transform(v => v ? v.trim().toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase()) : v),
   primerApellido: z.string()
     .min(1, 'Requerido')
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, 'Solo letras')
-    .transform(v => v.trim().toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase())),
+    .transform(v => v.trim().toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase())),
   segundoApellido: z.string()
     .min(1, 'Requerido')
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, 'Solo letras')
-    .transform(v => v.trim().toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase())),
+    .transform(v => v.trim().toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase())),
   tipoDoc: z.string().min(1, 'Requerido'),
   numDoc: z.string().min(6, 'Mínimo 6 dígitos').regex(/^\d+$/, 'Solo números'),
-  fechaNacimiento: z.string().min(1, 'Requerido'),
+  fechaNacimiento: z.string().min(1, 'Requerido').refine(date => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return new Date(date + 'T00:00:00') <= today;
+  }, { message: 'La fecha no puede ser futura' }).refine(date => {
+    const minDate = new Date();
+    minDate.setFullYear(minDate.getFullYear() - 100);
+    return new Date(date + 'T00:00:00') > minDate;
+  }, { message: 'La edad no puede ser mayor a 99 años' }),
   sexo: z.string().min(1, 'Requerido'),
   gestante: z.string().optional().nullable(),
+  mesesGestacion: z.union([z.string(), z.number()]).optional().nullable().transform(v => (v === '' || v == null || Number.isNaN(Number(v))) ? null : Number(v)),
   telefono: z.string()
     .length(10, 'Debe tener exactamente 10 dígitos')
     .regex(/^3\d{9}$/, 'Debe empezar por 3 y ser numérico'),
@@ -44,12 +53,13 @@ export const integranteSchema = z.object({
   antecTransmisibles: z.record(z.boolean()).optional().default({}),
   peso: z.coerce.number().min(0.1, 'Requerido'),
   talla: z.coerce.number().min(0.1, 'Requerido'),
-  perimetroBraquial: z.union([z.string(), z.number()]).optional().nullable().transform(v => (v === '' || v == null) ? null : Number(v)),
+  perimetroBraquial: z.union([z.string(), z.number()]).optional().nullable().transform(v => (v === '' || v == null || Number.isNaN(Number(v))) ? null : Number(v)),
   diagNutricional: z.string().optional().nullable(),
   practicaDeportiva: z.boolean().optional().default(false),
   lactanciaMaterna: z.boolean().optional().default(false),
-  lactanciaMeses: z.coerce.number().optional().nullable(),
+  lactanciaMeses: z.union([z.string(), z.number()]).optional().nullable().transform(v => (v === '' || v == null || Number.isNaN(Number(v))) ? null : Number(v)),
   esquemaAtenciones: z.boolean().optional().default(false),
+  esquemaVacunacion: z.boolean().optional().default(false),
   intervencionesPendientes: z.array(z.string()).optional().default([]),
   enfermedadAguda: z.boolean().optional().default(false),
   recibeAtencionMedica: z.boolean().optional().default(false),
@@ -59,7 +69,11 @@ export const integranteSchema = z.object({
 export const wizardSchema = z.object({
   // STEP 1: Ubicación
   estadoVisita: z.string().default('1'),
-  fechaDiligenciamiento: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  fechaDiligenciamiento: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(date => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return new Date(date + 'T00:00:00') <= today;
+  }, { message: 'No puede ser futura' }),
   departamento: z.string().min(1, 'Requerido').transform(v => v.toUpperCase()),
   municipio: z.string().min(1, 'Requerido').transform(v => v.toUpperCase()),
   centroPoblado: z.string().optional().nullable().transform(v => v?.toUpperCase() || ''),

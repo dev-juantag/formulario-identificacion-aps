@@ -337,6 +337,7 @@ export const ANTECEDENTES_CRONICOS = [
   { id: 'renal', label: 'Enfermedad renal crónica' },
   { id: 'huerfana', label: 'Enfermedad huérfana / rara' },
   { id: 'salud_mental', label: 'Trastorno de salud mental' },
+  { id: 'ninguno', label: 'Ninguno' },
 ]
 
 export const ANTECEDENTES_TRANSMISIBLES = [
@@ -347,6 +348,7 @@ export const ANTECEDENTES_TRANSMISIBLES = [
   { id: 'chagas', label: 'Enfermedad de Chagas' },
   { id: 'vih', label: 'VIH / SIDA' },
   { id: 'hepatitis', label: 'Hepatitis B / C' },
+  { id: 'ninguno', label: 'Ninguno' },
 ]
 
 export const INTERVENCIONES_PENDIENTES = [

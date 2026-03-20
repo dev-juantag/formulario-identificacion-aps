@@ -9,8 +9,10 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { integrantes, territorio, microterritorio, ...hogarData } = body
 
-    const toIntArray = (arr: any[]): number[] =>
-      (arr || []).map(val => parseInt(val)).filter(n => !isNaN(n))
+    const toIntArray = (arr: any): number[] => {
+      const arrayToProcess = Array.isArray(arr) ? arr : (arr ? [arr] : [])
+      return arrayToProcess.map(val => parseInt(String(val))).filter(n => !isNaN(n))
+    }
 
     const fichaData = {
       estadoVisita: String(hogarData.estadoVisita || '1'),
@@ -46,23 +48,23 @@ export async function POST(req: Request) {
       numHogares: hogarData.numHogares ? parseInt(hogarData.numHogares) : null,
       numDormitorios: hogarData.numDormitorios ? parseInt(hogarData.numDormitorios) : null,
       estratoSocial: hogarData.estratoSocial ? parseInt(hogarData.estratoSocial) : null,
-      hacinamiento: Boolean(hogarData.hacinamiento),
+      hacinamiento: hogarData.hacinamiento === true || hogarData.hacinamiento === 'true',
       fuenteAgua: toIntArray(hogarData.fuenteAgua),
       dispExcretas: toIntArray(hogarData.dispExcretas),
       aguasResiduales: toIntArray(hogarData.aguasResiduales),
       dispResiduos: toIntArray(hogarData.dispResiduos),
       riesgoAccidente: toIntArray(hogarData.riesgoAccidente),
       fuenteEnergia: hogarData.fuenteEnergia ? parseInt(hogarData.fuenteEnergia) : null,
-      presenciaVectores: Boolean(hogarData.presenciaVectores),
+      presenciaVectores: hogarData.presenciaVectores === true || hogarData.presenciaVectores === 'true',
       animales: toIntArray(hogarData.animales),
       cantAnimales: hogarData.cantAnimales ? parseInt(hogarData.cantAnimales) : null,
-      vacunacionMascotas: Boolean(hogarData.vacunacionMascotas),
+      vacunacionMascotas: hogarData.vacunacionMascotas === true || hogarData.vacunacionMascotas === 'true',
       // Familia
       tipoFamilia: hogarData.tipoFamilia ? parseInt(hogarData.tipoFamilia) : null,
       numIntegrantes: hogarData.numIntegrantes ? parseInt(hogarData.numIntegrantes) : null,
       apgar: hogarData.apgar ? parseInt(hogarData.apgar) : null,
       ecomapa: hogarData.ecomapa ? parseInt(hogarData.ecomapa) : null,
-      cuidadorPrincipal: Boolean(hogarData.cuidadorPrincipal),
+      cuidadorPrincipal: hogarData.cuidadorPrincipal === true || hogarData.cuidadorPrincipal === 'true',
       zarit: hogarData.zarit ? parseInt(hogarData.zarit) : null,
       vulnerabilidades: Array.isArray(hogarData.vulnerabilidades) ? hogarData.vulnerabilidades : [],
     }
@@ -84,6 +86,7 @@ export async function POST(req: Request) {
             parentesco: parseInt(int.parentesco) || 1,
             sexo: String(int.sexo || 'HOMBRE'),
             gestante: int.gestante || 'NA',
+            mesesGestacion: int.gestante === 'SI' && int.mesesGestacion ? parseInt(int.mesesGestacion) : null,
             telefono: int.telefono || null,
             nivelEducativo: int.nivelEducativo ? parseInt(int.nivelEducativo) : (null as any),
             ocupacion: int.ocupacion ? parseInt(int.ocupacion) : (null as any),
@@ -103,6 +106,7 @@ export async function POST(req: Request) {
             lactanciaMaterna: Boolean(int.lactanciaMaterna),
             lactanciaMeses: int.lactanciaMeses ? parseInt(int.lactanciaMeses) : null,
             esquemaAtenciones: Boolean(int.esquemaAtenciones),
+            esquemaVacunacion: Boolean(int.esquemaVacunacion),
             intervencionesPendientes: toIntArray(int.intervencionesPendientes),
             enfermedadAguda: Boolean(int.enfermedadAguda),
             recibeAtencionMedica: Boolean(int.recibeAtencionMedica),

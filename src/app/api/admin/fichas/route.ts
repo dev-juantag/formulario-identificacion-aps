@@ -61,7 +61,10 @@ export async function GET(req: Request) {
   if (qCreador) {
     whereOptions.OR = [
       { encuestador: { documento: { contains: qCreador } } },
-      { numDocEncuestador: { contains: qCreador } }
+      { numDocEncuestador: { contains: qCreador } },
+      { direccion: { contains: qCreador, mode: 'insensitive' } },
+      { integrantes: { some: { numDoc: { contains: qCreador } } } },
+      { codFicha: { contains: qCreador, mode: 'insensitive' } }
     ]
   }
 

@@ -125,6 +125,7 @@ model Integrante {
   parentesco        Int      // catalogo
   sexo              String   // HOMBRE, MUJER, INDETERMINADO
   gestante          String?  // SI, NO, NA
+  mesesGestacion    Int?
   telefono          String?
   
   // Educación y Trabajo
@@ -155,6 +156,7 @@ model Integrante {
   lactanciaMaterna  Boolean?
   lactanciaMeses    Int?
   esquemaAtenciones Boolean?
+  esquemaVacunacion Boolean?
   intervencionesPendientes Int[]
   enfermedadAguda   Boolean?
   recibeAtencionMedica Boolean?

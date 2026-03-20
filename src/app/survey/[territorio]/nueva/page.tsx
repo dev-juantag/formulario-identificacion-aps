@@ -35,6 +35,7 @@ export default function NuevaSurveyPage() {
   const [stepError, setStepError] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
 
   const { coords } = useGeolocation()
@@ -133,7 +134,26 @@ export default function NuevaSurveyPage() {
     }
 
     const stepFields = getFieldsForStep(currentStep)
-    const isStepValid = await methods.trigger(stepFields as any)
+    let isStepValid = await methods.trigger(stepFields as any)
+
+    if (isStepValid && currentStep === 2) {
+      setStepError('Verificando disponibilidad de códigos de identificación...');
+      const numHogar = methods.getValues('numHogar');
+      const numFamilia = methods.getValues('numFamilia');
+      const codFicha = methods.getValues('codFicha');
+
+      try {
+        const res = await fetch(`/api/survey/check_codigo?numHogar=${numHogar}&numFamilia=${numFamilia}&codFicha=${codFicha}`);
+        const data = await res.json();
+        if (data.exists) {
+          methods.setError(data.field, { type: 'manual', message: data.message });
+          setStepError(`Conflicto de unicidad: ${data.message} Por favor, ingresa un código único irrepetible.`);
+          isStepValid = false;
+        }
+      } catch (e) {
+        console.error('Error de verificación de códigos únicos', e);
+      }
+    }
 
     if (isStepValid) {
       setStepError('')
@@ -196,6 +216,7 @@ export default function NuevaSurveyPage() {
       })
       const result = await response.json()
       if (result.success) {
+        setSavedId(result.id)
         setSaved(true)
       } else {
         throw new Error(result.error || 'Error al guardar la información')
@@ -235,6 +256,15 @@ export default function NuevaSurveyPage() {
           >
             Nueva Identificación
           </button>
+          {savedId && (
+            <button
+              onClick={() => router.push(`/survey/${territorio}/${savedId}?print=true`)}
+              className="px-6 py-3 rounded-xl hover:opacity-90 text-white font-bold transition-all flex items-center justify-center gap-2"
+              style={{ background: '#3b82f6' }}
+            >
+              Imprimir Identificación
+            </button>
+          )}
         </div>
       </div>
     )

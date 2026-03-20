@@ -38,10 +38,14 @@ export async function GET() {
         vulnerabilidades: true,
         integrantes: {
           select: {
+            id: true,
             sexo: true,
             fechaNacimiento: true,
             gestante: true,
-            antecedentes: true
+            // @ts-ignore - Prisma client needs regeneration
+            mesesGestacion: true,
+            antecedentes: true,
+            createdAt: true
           }
         }
       }
@@ -85,10 +89,32 @@ export async function GET() {
 
       for (const rawI of f.integrantes) {
         const i: any = rawI
-        totalPersonas++
         const age = getAge(i.fechaNacimiento)
         
-        if (i.gestante === 'SI') gestantes++
+        // Excluir estadísticamente a los de 100 años o más
+        if (age >= 100) {
+          continue;
+        }
+
+        totalPersonas++
+
+        let isGestante = i.gestante === 'SI'
+        if (isGestante && i.mesesGestacion != null && i.createdAt) {
+          const createdAt = new Date(i.createdAt)
+          const now = new Date()
+          const monthsPassed = (now.getFullYear() - createdAt.getFullYear()) * 12 + (now.getMonth() - createdAt.getMonth())
+          if (i.mesesGestacion + monthsPassed >= 9) {
+            isGestante = false
+            // Actualizar DB en background
+            prisma.integrante.update({
+              where: { id: i.id },
+              // @ts-ignore - Prisma client needs regeneration
+              data: { gestante: 'NO', mesesGestacion: null }
+            }).catch(console.error)
+          }
+        }
+        
+        if (isGestante) gestantes++
         if (age >= 0 && age <= 4) menores5++
         if (age >= 60) mayores60++
         

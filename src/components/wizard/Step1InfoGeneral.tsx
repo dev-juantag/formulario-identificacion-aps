@@ -35,7 +35,7 @@ export default function Step1InfoGeneral() {
             </select>
           </F>
           <F label="Fecha de Diligenciamiento" required>
-            <input type="date" {...register('fechaDiligenciamiento')} className={inp} />
+            <input type="date" max={new Date().toISOString().split('T')[0]} {...register('fechaDiligenciamiento')} className={inp} />
           </F>
         </div>
       </div>
@@ -95,7 +95,7 @@ export default function Step1InfoGeneral() {
         <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#081e69' }}>Responsable / Encuestador</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <F label="No. Identificación EBS" required>
-            <input {...register('numEBS')} placeholder="Número EBS" className={inp} />
+            <input {...register('numEBS')} readOnly className={`${inp} bg-gray-100 cursor-not-allowed text-gray-600 font-bold`} />
           </F>
           <F label="Prestador Primario" required>
             <input {...register('prestadorPrimario')} readOnly className={`${inp} bg-gray-100 cursor-not-allowed text-gray-600 font-bold`} />
