@@ -94,10 +94,34 @@ export default function Step4Integrantes() {
             {open && (
               <div className="p-4 space-y-4 bg-white">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <F label="Primer Nombre" required><input {...register(`integrantes.${i}.primerNombre`)} className={inp} /></F>
-                  <F label="Segundo Nombre"><input {...register(`integrantes.${i}.segundoNombre`)} className={inp} /></F>
-                  <F label="Primer Apellido" required><input {...register(`integrantes.${i}.primerApellido`)} className={inp} /></F>
-                  <F label="Segundo Apellido" required><input {...register(`integrantes.${i}.segundoApellido`)} className={inp} /></F>
+                  <F label="Primer Nombre" required>
+                    <input 
+                      {...register(`integrantes.${i}.primerNombre`)} 
+                      className={inp} 
+                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''); }}
+                    />
+                  </F>
+                  <F label="Segundo Nombre">
+                    <input 
+                      {...register(`integrantes.${i}.segundoNombre`)} 
+                      className={inp} 
+                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''); }}
+                    />
+                  </F>
+                  <F label="Primer Apellido" required>
+                    <input 
+                      {...register(`integrantes.${i}.primerApellido`)} 
+                      className={inp} 
+                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''); }}
+                    />
+                  </F>
+                  <F label="Segundo Apellido" required>
+                    <input 
+                      {...register(`integrantes.${i}.segundoApellido`)} 
+                      className={inp} 
+                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''); }}
+                    />
+                  </F>
                   <F label="Tipo Doc." required>
                     <select {...register(`integrantes.${i}.tipoDoc`)} className={sel}>
                       <option value="">— Selecciona —</option>
@@ -142,7 +166,20 @@ export default function Step4Integrantes() {
                     </select>
                   </F>
                   <F label="Teléfono" required>
-                    <input type="tel" {...register(`integrantes.${i}.telefono`)} maxLength={10} className={inp} placeholder="3XX XXX XXXX" />
+                    <input 
+                      type="tel" 
+                      {...register(`integrantes.${i}.telefono`)} 
+                      maxLength={10} 
+                      className={inp} 
+                      placeholder="3XX XXX XXXX"
+                      onInput={(e) => {
+                        let val = e.currentTarget.value.replace(/[^0-9]/g, '');
+                        if (val.length > 0 && val[0] !== '3') {
+                          val = '3' + val;
+                        }
+                        e.currentTarget.value = val.slice(0, 10);
+                      }}
+                    />
                   </F>
                 </div>
 
