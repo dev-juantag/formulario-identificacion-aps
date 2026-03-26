@@ -6,46 +6,41 @@ import {
   FUENTE_AGUA, DISPOSICION_EXCRETAS, AGUAS_RESIDUALES, DISPOSICION_RESIDUOS,
   RIESGO_ACCIDENTE, FUENTE_ENERGIA, ANIMALES
 } from '@/lib/constants'
+import MultiSelect from './MultiSelect'
 import { inp, sel, card, cardBorder, lbl, lblStyle, required as reqStyle, chk, chkLabel, sectionTitle, sectionTitleStyle } from './wizardStyles'
 import { useEffect } from 'react'
 
 export default function Step2Vivienda() {
   const { register, watch, setValue, getValues } = useFormContext()
   const tipoVivienda = watch('tipoVivienda')
-  const animales = watch('animales') || []
-  const tieneAnimales = Array.isArray(animales) && animales.length > 0 && !animales.includes('9') && !animales.includes(9)
+  const animalesArr = watch('animales') || []
+  const tieneAnimales = Array.isArray(animalesArr) && animalesArr.length > 0 && !animalesArr.includes('9')
   const numEBS = watch('numEBS')
 
   useEffect(() => {
     if (!numEBS) return
-
     const fetchConsecutivos = async () => {
-      const currentHogar = getValues('numHogar')
-      const currentFamilia = getValues('numFamilia')
-      const currentFicha = getValues('codFicha')
-      
-      if (currentHogar && currentFamilia && currentFicha) return
-
+      const curH = getValues('numHogar')
+      const curF = getValues('numFamilia')
+      const curC = getValues('codFicha')
+      if (curH && curF && curC) return
       try {
         const res = await fetch(`/api/survey/consecutivos?numEBS=${numEBS}`)
         const json = await res.json()
         if (json.success && json.data) {
-          if (!currentHogar) setValue('numHogar', json.data.numHogar)
-          if (!currentFamilia) setValue('numFamilia', json.data.numFamilia)
-          if (!currentFicha) setValue('codFicha', json.data.codFicha)
+          if (!curH) setValue('numHogar', json.data.numHogar)
+          if (!curF) setValue('numFamilia', json.data.numFamilia)
+          if (!curC) setValue('codFicha', json.data.codFicha)
         }
       } catch (e) {
         console.error('Error fetching consecutivos', e)
       }
     }
-
     fetchConsecutivos()
   }, [numEBS, setValue, getValues])
 
   return (
     <div className="space-y-4">
-    
-      {/* Identificadores Matrioshka */}
       <div className={card} style={cardBorder}>
         <p className={sectionTitle} style={sectionTitleStyle}>Códigos de Identificación</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -61,13 +56,12 @@ export default function Step2Vivienda() {
         </div>
       </div>
 
-      {/* Características físicas */}
       <Sec title="Características Físicas">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <F label="Tipo de Vivienda" required>
             <select {...register('tipoVivienda')} className={sel}>
               <option value="">— Selecciona —</option>
-              {TIPO_VIVIENDA.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+              {TIPO_VIVIENDA.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
             </select>
           </F>
           {String(tipoVivienda) === '12' && (
@@ -78,19 +72,19 @@ export default function Step2Vivienda() {
           <F label="Material de paredes" required>
             <select {...register('matParedes')} className={sel}>
               <option value="">— Selecciona —</option>
-              {MATERIAL_PAREDES.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+              {MATERIAL_PAREDES.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
             </select>
           </F>
           <F label="Material del piso" required>
             <select {...register('matPisos')} className={sel}>
               <option value="">— Selecciona —</option>
-              {MATERIAL_PISOS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+              {MATERIAL_PISOS.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
             </select>
           </F>
           <F label="Material del techo" required>
             <select {...register('matTechos')} className={sel}>
               <option value="">— Selecciona —</option>
-              {MATERIAL_TECHOS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+              {MATERIAL_TECHOS.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
             </select>
           </F>
           <F label="N° hogares / familias" required>
@@ -102,7 +96,7 @@ export default function Step2Vivienda() {
           <F label="Estrato socioeconómico" required>
             <select {...register('estratoSocial')} className={sel}>
               <option value="">— Selecciona —</option>
-              {[1,2,3,4,5,6].map(e => <option key={e} value={e}>Estrato {e}</option>)}
+              {[1,2,3,4,5,6].map(e => <option key={e} value={String(e)}>Estrato {e}</option>)}
             </select>
           </F>
           <F label="¿Hacinamiento?">
@@ -114,22 +108,20 @@ export default function Step2Vivienda() {
         </div>
       </Sec>
 
-      {/* Saneamiento */}
       <Sec title="Saneamiento Básico">
-        <Multi label="Fuente de agua" options={FUENTE_AGUA} name="fuenteAgua" register={register} />
-        <Multi label="Disposición de excretas" options={DISPOSICION_EXCRETAS} name="dispExcretas" register={register} />
-        <Multi label="Aguas residuales" options={AGUAS_RESIDUALES} name="aguasResiduales" register={register} />
-        <Multi label="Disposición de residuos" options={DISPOSICION_RESIDUOS} name="dispResiduos" register={register} />
-        <Multi label="Riesgos de accidente" options={RIESGO_ACCIDENTE} name="riesgoAccidente" register={register} />
+        <MultiSelect label="Fuente de agua" options={FUENTE_AGUA} name="fuenteAgua" exclusiveId={99} />
+        <MultiSelect label="Disposición de excretas" options={DISPOSICION_EXCRETAS} name="dispExcretas" exclusiveId={6} />
+        <MultiSelect label="Aguas residuales" options={AGUAS_RESIDUALES} name="aguasResiduales" exclusiveId={99} />
+        <MultiSelect label="Disposición de residuos" options={DISPOSICION_RESIDUOS} name="dispResiduos" exclusiveId={99} />
+        <MultiSelect label="Riesgos de accidente" options={RIESGO_ACCIDENTE} name="riesgoAccidente" exclusiveId={7} />
         <F label="Fuente de energía para cocinar" required>
           <select {...register('fuenteEnergia')} className={sel}>
             <option value="">— Selecciona —</option>
-            {FUENTE_ENERGIA.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+            {FUENTE_ENERGIA.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
           </select>
         </F>
       </Sec>
 
-      {/* Vectores */}
       <Sec title="Vectores y Zoonosis">
         <F label="¿Se observan criaderos de vectores?" required>
           <div className="flex gap-4 mt-1">
@@ -141,7 +133,7 @@ export default function Step2Vivienda() {
             ))}
           </div>
         </F>
-        <Multi label="Animales en la vivienda" options={ANIMALES} name="animales" register={register} required={true} />
+        <MultiSelect label="Animales en la vivienda" options={ANIMALES} name="animales" required exclusiveId={9} />
         {tieneAnimales && (
           <>
             <F label="Cantidad de animales">
@@ -177,20 +169,5 @@ function F({ label, children, required, className }: { label: string; children: 
       </label>
       {children}
     </div>
-  )
-}
-
-function Multi({ label, options, name, register, required }: { label: string; options: {id: number; label: string}[]; name: string; register: any, required?: boolean }) {
-  return (
-    <F label={label} required={required}>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 mt-1">
-        {options.map(o => (
-          <label key={o.id} className={chkLabel}>
-            <input type="checkbox" value={o.id} {...register(name)} className={chk} />
-            <span className="text-xs leading-tight">{o.label}</span>
-          </label>
-        ))}
-      </div>
-    </F>
   )
 }

@@ -3,6 +3,7 @@
 import { useFormContext } from 'react-hook-form'
 import { TIPO_FAMILIA, APGAR_PREGUNTAS, APGAR_OPCIONES, ZARIT_OPCIONES, ECOMAPA_OPCIONES, VULNERABILIDADES } from '@/lib/constants'
 import { useState, useEffect } from 'react'
+import MultiSelect from './MultiSelect'
 import { inp, sel, card, cardBorder, lbl, lblStyle, required as reqStyle, chk, chkLabel } from './wizardStyles'
 
 export default function Step3Familia() {
@@ -27,15 +28,13 @@ export default function Step3Familia() {
 
   return (
     <div className="space-y-4">
-
-      {/* Estructura familiar */}
       <div className={card} style={cardBorder}>
         <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#081e69' }}>Estructura Familiar</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <F label="Tipo de familia" required>
             <select {...register('tipoFamilia')} className={sel}>
               <option value="">— Selecciona —</option>
-              {TIPO_FAMILIA.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+              {TIPO_FAMILIA.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
             </select>
           </F>
           <F label="N° de integrantes" required>
@@ -44,7 +43,6 @@ export default function Step3Familia() {
         </div>
       </div>
 
-      {/* APGAR */}
       <div className={card} style={cardBorder}>
         <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#081e69' }}>APGAR Familiar</p>
         <p className="text-[11px] text-gray-400 -mt-2">Califique cada pregunta del 0 al 4. Máx: 20 pts.</p>
@@ -76,18 +74,16 @@ export default function Step3Familia() {
         </div>
       </div>
 
-      {/* Ecomapa */}
       <div className={card} style={cardBorder}>
         <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#081e69' }}>Ecomapa Familiar</p>
         <F label="Calificación ecomapa">
           <select {...register('ecomapa')} className={sel}>
             <option value="">— Selecciona —</option>
-            {ECOMAPA_OPCIONES.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+            {ECOMAPA_OPCIONES.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
           </select>
         </F>
       </div>
 
-      {/* Riesgo Psicosocial */}
       <div className={card} style={cardBorder}>
         <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#081e69' }}>Riesgo Psicosocial</p>
         <F label="¿Existe cuidador principal?">
@@ -100,21 +96,18 @@ export default function Step3Familia() {
           <F label="Resultado Escala ZARIT">
             <select {...register('zarit')} className={sel}>
               <option value="">— Selecciona resultado —</option>
-              {ZARIT_OPCIONES.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+              {ZARIT_OPCIONES.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
             </select>
             <p className="text-[11px] text-gray-400 mt-1">Escala de 22 preguntas Likert 0-4.</p>
           </F>
         )}
-        <F label="Vulnerabilidad Social (múltiple)">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-1">
-            {VULNERABILIDADES.map(v => (
-              <label key={v.id} className={chkLabel}>
-                <input type="checkbox" value={v.id} {...register('vulnerabilidades')} className={chk} />
-                <span className="text-xs">{v.label}</span>
-              </label>
-            ))}
-          </div>
-        </F>
+        <MultiSelect 
+          label="Vulnerabilidad Social" 
+          options={VULNERABILIDADES} 
+          name="vulnerabilidades" 
+          exclusiveId="ninguno"
+          columns={2}
+        />
       </div>
     </div>
   )

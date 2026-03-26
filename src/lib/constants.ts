@@ -112,6 +112,7 @@ export const FUENTE_AGUA = [
   { id: 7, label: 'Fuente natural (río, quebrada, nacimiento)' },
   { id: 8, label: 'Agua embotellada o en bolsa' },
   { id: 9, label: 'Otro' },
+  { id: 99, label: 'Ninguna' },
 ]
 
 export const DISPOSICION_EXCRETAS = [
@@ -129,6 +130,7 @@ export const AGUAS_RESIDUALES = [
   { id: 3, label: 'Vertimiento a fuente hídrica' },
   { id: 4, label: 'A campo abierto' },
   { id: 5, label: 'Otro' },
+  { id: 99, label: 'Ninguna' },
 ]
 
 export const DISPOSICION_RESIDUOS = [
@@ -138,6 +140,7 @@ export const DISPOSICION_RESIDUOS = [
   { id: 4, label: 'Arrojo a fuente hídrica' },
   { id: 5, label: 'Basura a campo abierto' },
   { id: 6, label: 'Reciclaje / Aprovechamiento' },
+  { id: 99, label: 'Ninguna' },
 ]
 
 export const RIESGO_ACCIDENTE = [
@@ -337,6 +340,7 @@ export const ANTECEDENTES_CRONICOS = [
   { id: 'renal', label: 'Enfermedad renal crónica' },
   { id: 'huerfana', label: 'Enfermedad huérfana / rara' },
   { id: 'salud_mental', label: 'Trastorno de salud mental' },
+  { id: 'ninguno', label: 'Ninguno' },
 ]
 
 export const ANTECEDENTES_TRANSMISIBLES = [
@@ -347,6 +351,7 @@ export const ANTECEDENTES_TRANSMISIBLES = [
   { id: 'chagas', label: 'Enfermedad de Chagas' },
   { id: 'vih', label: 'VIH / SIDA' },
   { id: 'hepatitis', label: 'Hepatitis B / C' },
+  { id: 'ninguno', label: 'Ninguno' },
 ]
 
 export const INTERVENCIONES_PENDIENTES = [
@@ -360,6 +365,7 @@ export const INTERVENCIONES_PENDIENTES = [
   { id: 8, label: 'Control de crecimiento y desarrollo' },
   { id: 9, label: 'Control de enfermedades crónicas' },
   { id: 10, label: 'Atención en salud oral' },
+  { id: 99, label: 'Ninguna' },
 ]
 
 export const REMISIONES_APS = [
@@ -371,6 +377,7 @@ export const REMISIONES_APS = [
   { id: 'nutricion', label: 'Nutrición y Dietética' },
   { id: 'fisioterapia', label: 'Fisioterapia' },
   { id: 'optometria', label: 'Optometría' },
+  { id: 'ninguna', label: 'Ninguna' },
 ]
 
 export const DIAGNOSTICO_NUTRICIONAL = [
