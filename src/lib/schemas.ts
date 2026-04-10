@@ -30,14 +30,14 @@ export const integranteSchema = z.object({
   estadoCivil: z.string().optional().nullable(),
   parentesco: z.string().min(1, 'Requerido'),
   // Educación y Diferencial
-  nivelEducativo: z.string().optional().nullable(),
-  ocupacion: z.string().optional().nullable(),
-  regimen: z.string().optional().nullable(),
+  nivelEducativo: z.string().min(1, 'Requerido'),
+  ocupacion: z.string().min(1, 'Requerido'),
+  regimen: z.string().min(1, 'Requerido'),
   eapb: z.string().optional().nullable(),
-  etnia: z.string().optional().nullable(),
+  etnia: z.string().min(1, 'Requerido'),
   puebloIndigena: z.string().optional().nullable(),
-  grupoPoblacional: z.array(z.string()).optional().default([]),
-  discapacidades: z.array(z.string()).optional().default([]),
+  grupoPoblacional: z.array(z.string()).default([]),
+  discapacidades: z.array(z.string()).default([]),
 
   // V. EVALUACIÓN SALUD (Step 5)
   antecedentes: z.record(z.boolean()).optional().default({}),

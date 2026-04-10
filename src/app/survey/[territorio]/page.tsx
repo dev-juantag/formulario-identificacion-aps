@@ -29,24 +29,32 @@ export default function TerritoryPage() {
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
-  const handleBuscar = async () => {
-    if (!cedula.trim() && !searched) {
-      // Cargar todas las fichas del territorio sin filtro
-    }
+  const handleBuscar = async (targetPage: number = 1) => {
     setLoading(true)
     setSearched(true)
     try {
-      const params = new URLSearchParams({ territorio })
-      if (cedula.trim()) params.set('cedula', cedula.trim())
-      if (estado) params.set('estado', estado)
-      const res = await fetch(`/api/survey/buscar?${params}`)
+      const qparams = new URLSearchParams({ territorio, page: targetPage.toString() })
+      if (cedula.trim()) qparams.set('cedula', cedula.trim())
+      if (estado) qparams.set('estado', estado)
+      const res = await fetch(`/api/survey/buscar?${qparams}`)
       const data = await res.json()
       setFichas(data.fichas || [])
+      setTotal(data.total || 0)
+      setTotalPages(data.totalPages || 1)
+      setPage(targetPage)
     } catch {
       setFichas([])
+      setTotal(0)
+      setTotalPages(1)
     } finally {
       setLoading(false)
+      if (targetPage > 1) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
     }
   }
 
@@ -114,7 +122,7 @@ export default function TerritoryPage() {
             <option value="3">Rechazadas</option>
           </select>
           <button
-            onClick={handleBuscar}
+            onClick={() => handleBuscar(1)}
             disabled={loading}
             className="px-6 py-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:bg-slate-50 font-semibold transition-all flex items-center gap-2 text-slate-700"
           >
@@ -155,7 +163,7 @@ export default function TerritoryPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          <p className="text-sm text-slate-500 font-medium">{fichas.length} ficha(s) encontrada(s)</p>
+          <p className="text-sm text-slate-500 font-medium">{total} ficha(s) encontrada(s)</p>
           {fichas.map((ficha) => (
             <div
               key={ficha.id}
@@ -204,6 +212,53 @@ export default function TerritoryPage() {
               </div>
             </div>
           ))}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 py-6">
+              <button
+                disabled={page === 1 || loading}
+                onClick={() => handleBuscar(page - 1)}
+                className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                Anterior
+              </button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum = page
+                  if (page <= 3) pageNum = i + 1
+                  else if (page >= totalPages - 2) pageNum = totalPages - 4 + i
+                  else pageNum = page - 2 + i
+
+                  if (pageNum < 1 || pageNum > totalPages) return null
+
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handleBuscar(pageNum)}
+                      disabled={loading}
+                      className={`w-10 h-10 text-sm font-bold rounded-xl transition-all ${
+                        page === pageNum
+                          ? 'bg-[#081e69] text-white'
+                          : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-600'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <button
+                disabled={page === totalPages || loading}
+                onClick={() => handleBuscar(page + 1)}
+                className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
         </div>
       )}
 

@@ -2,7 +2,7 @@
 
 import { useFormContext, useFieldArray } from 'react-hook-form'
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import MultiSelect from './MultiSelect'
 import {
   TIPO_DOCUMENTO, SEXO, PARENTESCO, NIVEL_EDUCATIVO, OCUPACION,
@@ -28,6 +28,23 @@ export default function Step4Integrantes() {
   const { register, control, watch, setValue } = useFormContext()
   const { fields, append, remove } = useFieldArray({ control, name: 'integrantes' })
   const [expanded, setExpanded] = useState<number[]>([0])
+  
+  const numIntegrantesField = watch('numIntegrantes')
+  const numIntegrantes = parseInt(numIntegrantesField) || 0
+
+  useEffect(() => {
+    // Ajustar la cantidad de integrantes al valor definido en Step 3
+    const currentCount = fields.length
+    if (numIntegrantes > currentCount) {
+      for (let i = 0; i < numIntegrantes - currentCount; i++) {
+        append(defaultIntegrante)
+      }
+    } else if (numIntegrantes < currentCount) {
+      for (let i = currentCount - 1; i >= numIntegrantes; i--) {
+        remove(i)
+      }
+    }
+  }, [numIntegrantes, fields.length, append, remove])
 
   const toggle = (i: number) => setExpanded(prev =>
     prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]
@@ -36,14 +53,9 @@ export default function Step4Integrantes() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-500">{fields.length} integrante(s)</p>
-        <button
-          type="button"
-          onClick={() => { append(defaultIntegrante); setExpanded(p => [...p, fields.length]) }}
-          className={btnGreen} style={btnGreenStyle}
-        >
-          <Plus className="w-3.5 h-3.5" /> Agregar
-        </button>
+        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
+          Formularios de integrantes ({fields.length} de {numIntegrantes})
+        </p>
       </div>
 
       {fields.map((field, i) => {
@@ -78,15 +90,6 @@ export default function Step4Integrantes() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {fields.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); remove(i) }}
-                    className="p-1 rounded-lg transition-colors text-red-400 hover:text-red-600 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
                 {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
               </div>
             </div>
@@ -187,19 +190,19 @@ export default function Step4Integrantes() {
                   Educación y Afiliación
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <F label="Nivel Educativo">
+                  <F label="Nivel Educativo" required>
                     <select {...register(`integrantes.${i}.nivelEducativo`)} className={sel}>
                       <option value="">— Selecciona —</option>
                       {NIVEL_EDUCATIVO.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
                     </select>
                   </F>
-                  <F label="Ocupación">
+                  <F label="Ocupación" required>
                     <select {...register(`integrantes.${i}.ocupacion`)} className={sel}>
                       <option value="">— Selecciona —</option>
                       {OCUPACION.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
                     </select>
                   </F>
-                  <F label="Régimen de Salud">
+                  <F label="Régimen de Salud" required>
                     <select {...register(`integrantes.${i}.regimen`)} className={sel}>
                       <option value="">— Selecciona —</option>
                       {REGIMEN_SALUD.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
@@ -214,7 +217,7 @@ export default function Step4Integrantes() {
                   Enfoque Diferencial
                 </p>
                 <div className="space-y-2.5">
-                  <F label="Pertenencia Étnica">
+                  <F label="Pertenencia Étnica" required>
                     <select {...register(`integrantes.${i}.etnia`)} className={sel}>
                       <option value="">— Selecciona —</option>
                       {ETNIA.map(o => <option key={o.id} value={String(o.id)}>{o.label}</option>)}
