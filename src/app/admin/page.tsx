@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ScatterChart, Scatter, ZAxis } from 'recharts'
-import { Users, Home, MapPin, HeartPulse, ShieldAlert, Baby, PersonStanding, AlertTriangle, Activity } from 'lucide-react'
+import { Users, Home, MapPin, HeartPulse, ShieldAlert, Baby, PersonStanding, AlertTriangle, Activity, ShieldOff, ExternalLink, TrendingDown, User, UserPlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface Stats {
@@ -18,8 +18,11 @@ interface Stats {
   riesgoVulnerabilidad: number
   riesgoCronico: number
   gestantes: number
-  menores5: number
+  menores10: number
   mayores60: number
+  sinAseguramiento: number
+  totalRemisiones: number
+  desnutricion: number
 }
 
 const PyramidTooltip = ({ active, payload, label }: any) => {
@@ -103,26 +106,28 @@ export default function AdminDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">
         <div>
           <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Análisis Poblacional</h1>
-          <p className="text-slate-500 font-medium text-sm mt-1">Monitoreo Oficial de Atención Primaria en Salud (APS)</p>
+          <p className="text-slate-500 font-medium text-sm mt-1">Monitoreo Oficial de Atención Primaria en Salud (APS) • <span className="text-green-600 font-bold uppercase">Solo Visitas Efectivas</span></p>
         </div>
       </div>
 
       {/* Consolidados de Campo (Supremos) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
         {[
-          { label: 'Total Personas', value: stats?.totalPersonas ?? '—', icon: Users, colors: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/20' },
-          { label: 'Total Hogares', value: stats?.totalHogares ?? '—', icon: Home, colors: 'from-orange-400 to-red-500', shadow: 'shadow-orange-500/20' },
-          { label: 'Viviendas Únicas', value: stats?.totalViviendas ?? '—', icon: MapPin, colors: 'from-purple-500 to-fuchsia-600', shadow: 'shadow-purple-500/20' },
+          { label: 'Total Personas', value: stats?.totalPersonas ?? '—', icon: Users, colors: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/20', colSpan: 'md:col-span-1' },
+          { label: 'Mujeres', value: stats?.Mujeres ?? '—', icon: User, colors: 'from-pink-400 to-rose-500', shadow: 'shadow-pink-500/20', colSpan: 'md:col-span-1' },
+          { label: 'Hombres', value: stats?.Hombres ?? '—', icon: User, colors: 'from-blue-400 to-cyan-500', shadow: 'shadow-blue-500/20', colSpan: 'md:col-span-1' },
+          { label: 'Hogares Efectivos', value: stats?.totalHogares ?? '—', icon: Home, colors: 'from-orange-400 to-red-500', shadow: 'shadow-orange-500/20', colSpan: 'md:col-span-1' },
+          { label: 'Viviendas', value: stats?.totalViviendas ?? '—', icon: MapPin, colors: 'from-purple-500 to-fuchsia-600', shadow: 'shadow-purple-500/20', colSpan: 'md:col-span-1' },
         ].map((kpi, i) => (
-          <div key={i} className="group relative bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+          <div key={i} className={`group relative bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden ${kpi.colSpan}`}>
             <div className={`absolute -right-4 -top-4 w-28 h-28 bg-gradient-to-br ${kpi.colors} opacity-[0.08] dark:opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`} />
             <div className={`inline-flex p-3 rounded-2xl mb-4 bg-gradient-to-br ${kpi.colors} text-white shadow-lg ${kpi.shadow}`}>
-              <kpi.icon className="w-6 h-6" />
+              <kpi.icon className="w-5 h-5" />
             </div>
-            <p className="text-4xl font-black text-slate-800 dark:text-white tracking-tight">
+            <p className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">
               {loading ? <span className="animate-pulse text-slate-300">...</span> : kpi.value}
             </p>
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">{kpi.label}</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">{kpi.label}</p>
           </div>
         ))}
       </div>
@@ -186,28 +191,55 @@ export default function AdminDashboard() {
       </div>
 
       {/* Indicadores Salud y Familia */}
-      <h3 className="font-black text-xl text-slate-800 dark:text-white pt-4 px-2">Vulnerabilidad y Riesgo Clínico</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        {[
-          { icon: Baby, label: 'Gestantes Activas', val: stats?.gestantes, color: 'text-pink-600', bg: 'bg-pink-100' },
-          { icon: Activity, label: 'Bajo < 5 Años', val: stats?.menores5, color: 'text-blue-600', bg: 'bg-blue-100' },
-          { icon: PersonStanding, label: 'Mayor > 60 Años', val: stats?.mayores60, color: 'text-indigo-600', bg: 'bg-indigo-100' },
-          { icon: AlertTriangle, label: 'Riesgo Social', val: stats?.riesgoVulnerabilidad, color: 'text-orange-600', bg: 'bg-orange-100' },
-          { icon: HeartPulse, label: 'Alarmas Crónicas', val: stats?.riesgoCronico, color: 'text-red-600', bg: 'bg-red-100' },
-          { icon: ShieldAlert, label: 'Disfuncion APGAR', val: stats?.apgarDisfuncional, color: 'text-amber-600', bg: 'bg-amber-100' },
-        ].map((item, i) => (
-          <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center text-center gap-2 hover:shadow-md transition-shadow">
-            <div className={`p-3 rounded-full ${item.bg}`}>
-              <item.icon className={`w-6 h-6 ${item.color}`} />
+      <div className="space-y-4">
+        <h3 className="font-black text-xl text-slate-800 dark:text-white pt-4 px-2">Vulnerabilidad y Riesgo Clínico</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+          {[
+            { icon: Baby, label: 'Gestantes Activas', val: stats?.gestantes, color: 'text-pink-600', bg: 'bg-pink-100' },
+            { icon: Activity, label: 'Menores < 10 Años', val: stats?.menores10, color: 'text-blue-600', bg: 'bg-blue-100' },
+            { icon: PersonStanding, label: 'Mayor > 60 Años', val: stats?.mayores60, color: 'text-indigo-600', bg: 'bg-indigo-100' },
+            { icon: AlertTriangle, label: 'Riesgo Social', val: stats?.riesgoVulnerabilidad, color: 'text-orange-600', bg: 'bg-orange-100' },
+            { icon: HeartPulse, label: 'Alarmas Crónicas', val: stats?.riesgoCronico, color: 'text-red-600', bg: 'bg-red-100' },
+            { icon: ShieldAlert, label: 'Disfuncion APGAR', val: stats?.apgarDisfuncional, color: 'text-amber-600', bg: 'bg-amber-100' },
+          ].map((item, i) => (
+            <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center text-center gap-2 hover:shadow-md transition-shadow">
+              <div className={`p-3 rounded-full ${item.bg}`}>
+                <item.icon className={`w-5 h-5 ${item.color}`} />
+              </div>
+              <p className="text-2xl font-black text-slate-800 dark:text-white mt-1">
+                {loading ? '-' : item.val}
+              </p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide leading-tight">{item.label}</p>
             </div>
-            <p className="text-2xl font-black text-slate-800 dark:text-white mt-1">
-              {loading ? '-' : item.val}
-            </p>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-tight">{item.label}</p>
-          </div>
-        ))}
+          ))}
+        </div>
+      </div>
+
+      {/* Nuevos Indicadores Solicitados */}
+      <div className="space-y-4">
+        <h3 className="font-black text-xl text-slate-800 dark:text-white pt-4 px-2">Aseguramiento y Remisiones</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {[
+            { label: 'Sin Aseguramiento (No Afiliados)', val: stats?.sinAseguramiento, icon: ShieldOff, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-100' },
+            { label: 'Total Personas Remitidas', val: stats?.totalRemisiones, icon: ExternalLink, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+            { label: 'Niños con Desnutrición (< 10 años)', val: stats?.desnutricion, icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },
+          ].map((item, i) => (
+            <div key={i} className={`bg-white dark:bg-slate-900 border ${item.border} rounded-3xl p-6 shadow-sm flex items-center gap-5 hover:shadow-lg transition-all`}>
+              <div className={`p-4 rounded-2xl ${item.bg}`}>
+                <item.icon className={`w-8 h-8 ${item.color}`} />
+              </div>
+              <div>
+                <p className="text-3xl font-black text-slate-800 dark:text-white">
+                  {loading ? '-' : item.val}
+                </p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-tight">{item.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
     </div>
   )
 }
+

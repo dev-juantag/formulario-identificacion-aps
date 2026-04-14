@@ -29,6 +29,9 @@ function getAgeGroup(age: number) {
 export async function GET() {
   try {
     const fichas = await prisma.fichaHogar.findMany({
+      where: {
+        estadoVisita: '1' // Solo visitas efectivas
+      },
       select: {
         territorio: true,
         direccion: true,
@@ -41,7 +44,10 @@ export async function GET() {
             sexo: true,
             fechaNacimiento: true,
             gestante: true,
-            antecedentes: true
+            antecedentes: true,
+            regimen: true,
+            remisiones: true,
+            diagNutricional: true
           }
         }
       }
@@ -57,8 +63,12 @@ export async function GET() {
     let riesgoCronico = 0
     
     let gestantes = 0
-    let menores5 = 0
+    let menores10 = 0
     let mayores60 = 0
+    
+    let sinAseguramiento = 0
+    let totalRemisiones = 0
+    let desnutricion = 0
 
     let Hombres = 0
     let Mujeres = 0
@@ -89,9 +99,18 @@ export async function GET() {
         const age = getAge(i.fechaNacimiento)
         
         if (i.gestante === 'SI') gestantes++
-        if (age >= 0 && age <= 4) menores5++
+        if (age >= 0 && age < 10) menores10++
         if (age >= 60) mayores60++
         
+        // Sin Aseguramiento
+        if (i.regimen === 'NO_AFILIADO') sinAseguramiento++
+        
+        // Remisiones
+        if (i.remisiones && i.remisiones.length > 0) totalRemisiones++
+        
+        // Desnutrición en niños (< 10 años)
+        if (age < 10 && i.diagNutricional === 5) desnutricion++
+
         if (i.antecedentes) {
           const ant = i.antecedentes as Record<string, boolean>
           if (Object.values(ant).some(v => v === true)) riesgoCronico++
@@ -134,10 +153,14 @@ export async function GET() {
       riesgoVulnerabilidad,
       riesgoCronico,
       gestantes,
-      menores5,
-      mayores60
+      menores10,
+      mayores60,
+      sinAseguramiento,
+      totalRemisiones,
+      desnutricion
     })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
+
