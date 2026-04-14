@@ -1,130 +1,183 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
+import {
+  TIPO_VIVIENDA, MATERIAL_PAREDES, MATERIAL_PISOS, MATERIAL_TECHOS, FUENTE_AGUA,
+  DISPOSICION_EXCRETAS, AGUAS_RESIDUALES, DISPOSICION_RESIDUOS, RIESGO_ACCIDENTE,
+  FUENTE_ENERGIA, ANIMALES, TIPO_FAMILIA, APGAR_OPCIONES, ECOMAPA_OPCIONES,
+  VULNERABILIDADES, PARENTESCO, NIVEL_EDUCATIVO, OCUPACION, GRUPO_POBLACIONAL,
+  DISCAPACIDADES, ANTECEDENTES_CRONICOS, ANTECEDENTES_TRANSMISIBLES, 
+  INTERVENCIONES_PENDIENTES, REMISIONES_APS, DIAGNOSTICO_NUTRICIONAL,
+  PERFIL_ENCUESTADOR, ETNIA
+} from '@/lib/constants'
 
-const prisma = new PrismaClient()
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const exportAll = searchParams.get('all') === 'true'
+
     const fichas = await prisma.fichaHogar.findMany({
-      where: { estadoVisita: '1' },
-      include: { integrantes: true },
-      orderBy: { consecutivo: 'asc' },
+      where: exportAll ? undefined : { estadoVisita: '1' },
+      include: { 
+        integrantes: true,
+        encuestador: true
+      },
+      orderBy: { consecutivo: 'desc' },
     })
 
     const lines: string[] = []
 
-    // Header Registro Tipo 2 (Ficha Hogar)
-    lines.push([
-      'CONSECUTIVO', 'ESTADO_VISITA', 'DEPARTAMENTO', 'MUNICIPIO', 'TERRITORIO', 'MICROTERRITORIO',
-      'CENTRO_POBLADO', 'DIRECCION', 'LATITUD', 'LONGITUD', 'FECHA_DILIGENCIAMIENTO',
-      'NUM_EBS', 'PRESTADOR', 'TIPO_DOC_ENCUESTADOR', 'NUM_DOC_ENCUESTADOR', 'PERFIL_ENCUESTADOR',
-      'TIPO_VIVIENDA', 'MAT_PAREDES', 'MAT_PISOS', 'MAT_TECHOS', 'NUM_HOGARES', 'NUM_DORMITORIOS',
-      'ESTRATO', 'HACINAMIENTO', 'FUENTE_AGUA', 'DISP_EXCRETAS', 'AGUAS_RESIDUALES',
-      'DISP_RESIDUOS', 'RIESGO_ACCIDENTE', 'FUENTE_ENERGIA', 'PRESENCIA_VECTORES',
-      'ANIMALES', 'CANT_ANIMALES', 'VAC_MASCOTAS',
-      'TIPO_FAMILIA', 'NUM_INTEGRANTES', 'APGAR', 'ECOMAPA', 'CUIDADOR_PRINCIPAL', 'ZARIT',
-      'VULNERABILIDADES', 'FECHA_CREACION',
-      // Integrante 
-      'INT_PRIMER_NOMBRE', 'INT_SEGUNDO_NOMBRE', 'INT_PRIMER_APELLIDO', 'INT_SEGUNDO_APELLIDO',
-      'INT_TIPO_DOC', 'INT_NUM_DOC', 'INT_FECHA_NAC', 'INT_PARENTESCO', 'INT_SEXO', 'INT_GESTANTE',
-      'INT_TELEFONO', 'INT_NIV_EDUCATIVO', 'INT_OCUPACION', 'INT_REGIMEN', 'INT_EAPB',
-      'INT_ETNIA', 'INT_PUEBLO', 'INT_GRUPO_POB', 'INT_DISCAPACIDADES',
-      'INT_ANTECEDENTES', 'INT_TRANSMISIBLES',
-      'INT_PESO', 'INT_TALLA', 'INT_PERIM_BRAQUIAL', 'INT_DIAG_NUTRICIONAL',
-      'INT_PRACTICA_DEP', 'INT_LACTANCIA', 'INT_LACTANCIA_MESES', 'INT_ESQUEMA_ATENCIONES',
-      'INT_INTERVENCIONES', 'INT_ENFERMEDAD_AGUDA', 'INT_ATENCION_MEDICA', 'INT_REMISIONES',
-    ].join(';'))
+    const headers = [
+      "globalid", "consecutivo", "estadoVisita", "departamento", "codMunicipio", 
+      "municipio", "territorio", "microterritorio", "uzpe", "centroPoblado", 
+      "direccion", "numEBS", "prestadorPrimario", "numHogar", "numFamilia", 
+      "codFicha", "latitud", "longitud", "fechaDiligenciamiento", "encuestadorNombre", 
+      "encuestadorDoc", "tipoVivienda", "matParedes", "matPisos", "matTechos", 
+      "numHogares", "numDormitorios", "estratoSocial", "hacinamiento", "fuenteAgua", 
+      "dispExcretas", "aguasResiduales", "dispResiduos", "riesgoAccidente", "fuenteEnergia", 
+      "presenciaVectores", "animales", "cantAnimales", "vacunacionMascotas", "tipoFamilia", 
+      "numIntegrantes", "apgar", "apgar_P1", "apgar_P2", "apgar_P3", "apgar_P4", 
+      "apgar_P5", "ecomapa", "cuidadorPrincipal", "zarit", "vulnerabilidades", 
+      "pacienteId", "nombres", "apellidos", "tipoDoc", "documento", 
+      "fechaNacimiento", "sexo", "generoIdentidad", "parentesco", "gestante", 
+      "mesesGestacion", "telefono", "nivelEducativo", "ocupacion", "regimen", 
+      "eapb", "etnia", "puebloIndigena", "grupoPoblacional", "discapacidades", 
+      "peso", "talla", "perimetroBraquial", "diagNutricional", "practicaDeportiva", 
+      "lactanciaMaterna", "lactanciaMeses", "esquemaAtenciones", "esquemaVacunacion", 
+      "intervencionesPendientes", "enfermedadAguda", "recibeAtencionMedica", "remisiones", 
+      "antecedentesCronicos", "antecedentesTransmisibles"
+    ]
+
+    lines.push(headers.join(';'))
+
+    const formatBool = (val: boolean | null | undefined) => {
+      if (val === true) return 'SI'
+      if (val === false) return 'NO'
+      return ''
+    }
+
+    const mapLabel = (id: any, catalog: {id: any, label: string}[]) => {
+      if (id === null || id === undefined || id === '') return ''
+      const item = catalog.find(c => String(c.id) === String(id))
+      return item ? item.label : id
+    }
+
+    const mapArray = (ids: any[], catalog: {id: any, label: string}[]) => {
+      if (!Array.isArray(ids) || ids.length === 0) return ''
+      return ids.map(id => mapLabel(id, catalog)).filter(Boolean).join(', ')
+    }
+
+    const mapObjectKeys = (obj: Record<string, boolean> | null | undefined, catalog: {id: string, label: string}[]) => {
+      if (!obj) return ''
+      return Object.entries(obj).filter(([, v]) => v).map(([k]) => mapLabel(k, catalog)).join(', ')
+    }
 
     for (const rawF of fichas) {
       const f: any = rawF
+      const encNombre = f.encuestador ? [f.encuestador.nombre, f.encuestador.apellidos].filter(Boolean).join(" ") : ""
+      const encDoc = f.encuestador ? f.encuestador.documento : (f.numDocEncuestador || "")
+
       const baseRow = [
-        f.consecutivo,
-        f.estadoVisita,
-        f.departamento,
-        f.municipio,
-        f.territorio,
-        f.microterritorio,
+        f.id || '',
+        f.consecutivo ?? '',
+        f.estadoVisita === '1' ? 'Efectiva' : f.estadoVisita,
+        f.departamento || '',
+        '', // codMunicipio no esta en schema explicito, se puede omitir o hardcodear
+        f.municipio || '',
+        f.territorio || '',
+        f.microterritorio || '',
+        f.uzpe || '',
         f.centroPoblado || '',
-        `"${f.direccion}"`,
-        f.latitud || '',
-        f.longitud || '',
-        f.fechaDiligenciamiento.toISOString().split('T')[0],
+        `"${f.direccion || ''}"`,
         f.numEBS || '',
         f.prestadorPrimario || '',
-        f.tipoDocEncuestador || '',
-        f.numDocEncuestador || '',
-        f.perfilEncuestador || '',
-        f.tipoVivienda || '',
-        f.matParedes || '',
-        f.matPisos || '',
-        f.matTechos || '',
-        f.numHogares || '',
-        f.numDormitorios || '',
-        f.estratoSocial || '',
-        f.hacinamiento ? 'SI' : 'NO',
-        f.fuenteAgua.join(','),
-        f.dispExcretas.join(','),
-        f.aguasResiduales.join(','),
-        f.dispResiduos.join(','),
-        f.riesgoAccidente.join(','),
-        f.fuenteEnergia || '',
-        f.presenciaVectores ? 'SI' : 'NO',
-        f.animales.join(','),
-        f.cantAnimales || '',
-        f.vacunacionMascotas ? 'SI' : 'NO',
-        f.tipoFamilia || '',
-        f.numIntegrantes || '',
-        f.apgar || '',
-        f.ecomapa || '',
-        f.cuidadorPrincipal ? 'SI' : 'NO',
-        f.zarit || '',
-        f.vulnerabilidades.join(','),
-        f.createdAt.toISOString().split('T')[0],
+        f.numHogar || '',
+        f.numFamilia || '',
+        f.codFicha || '',
+        f.latitud ? String(f.latitud).replace('.', ',') : '',
+        f.longitud ? String(f.longitud).replace('.', ',') : '',
+        f.fechaDiligenciamiento ? new Date(f.fechaDiligenciamiento).toISOString().split('T')[0] : '',
+        encNombre,
+        encDoc,
+        mapLabel(f.tipoVivienda, TIPO_VIVIENDA),
+        mapLabel(f.matParedes, MATERIAL_PAREDES),
+        mapLabel(f.matPisos, MATERIAL_PISOS),
+        mapLabel(f.matTechos, MATERIAL_TECHOS),
+        f.numHogares ?? '',
+        f.numDormitorios ?? '',
+        f.estratoSocial ?? '',
+        formatBool(f.hacinamiento),
+        mapArray(f.fuenteAgua, FUENTE_AGUA),
+        mapArray(f.dispExcretas, DISPOSICION_EXCRETAS),
+        mapArray(f.aguasResiduales, AGUAS_RESIDUALES),
+        mapArray(f.dispResiduos, DISPOSICION_RESIDUOS),
+        mapArray(f.riesgoAccidente, RIESGO_ACCIDENTE),
+        mapLabel(f.fuenteEnergia, FUENTE_ENERGIA),
+        formatBool(f.presenciaVectores),
+        mapArray(f.animales, ANIMALES),
+        f.cantAnimales ?? '',
+        formatBool(f.vacunacionMascotas),
+        mapLabel(f.tipoFamilia, TIPO_FAMILIA),
+        f.numIntegrantes ?? '',
+        mapLabel(f.apgar, APGAR_OPCIONES),
+        '', // apgar_P1
+        '', // apgar_P2
+        '', // apgar_P3
+        '', // apgar_P4
+        '', // apgar_P5
+        mapLabel(f.ecomapa, ECOMAPA_OPCIONES),
+        formatBool(f.cuidadorPrincipal),
+        f.zarit ?? '',
+        mapArray(f.vulnerabilidades, VULNERABILIDADES),
       ]
 
-      if (f.integrantes.length === 0) {
-        lines.push([...baseRow, ...Array(33).fill('')].join(';'))
+      if (!f.integrantes || f.integrantes.length === 0) {
+        // Rellenar las variables del integrante con vacios
+        lines.push([...baseRow, ...Array(headers.length - baseRow.length).fill('')].join(';'))
       } else {
         for (const rawInt of f.integrantes) {
           const int: any = rawInt
-          const antec = int.antecedentes as Record<string, boolean> | null || {}
-          const trans = int.antecTransmisibles as Record<string, boolean> | null || {}
+          
+          const nombres = [int.primerNombre, int.segundoNombre].filter(Boolean).join(" ")
+          const apellidos = [int.primerApellido, int.segundoApellido].filter(Boolean).join(" ")
 
           const intRow = [
-            int.primerNombre,
-            int.segundoNombre || '',
-            int.primerApellido,
-            int.segundoApellido || '',
-            int.tipoDoc,
-            int.numDoc,
-            int.fechaNacimiento,
-            int.parentesco,
-            int.sexo,
+            int.id || '',
+            nombres,
+            apellidos,
+            int.tipoDoc || '',
+            int.numDoc || '',
+            int.fechaNacimiento || '',
+            int.sexo || '',
+            int.sexo || '', // generoIdentidad equivalente a sexo inicialmente
+            mapLabel(int.parentesco, PARENTESCO),
             int.gestante || '',
+            '', // mesesGestacion
             int.telefono || '',
-            int.nivelEducativo || '',
-            int.ocupacion || '',
+            mapLabel(int.nivelEducativo, NIVEL_EDUCATIVO),
+            mapLabel(int.ocupacion, OCUPACION),
             int.regimen || '',
             int.eapb || '',
-            int.etnia || '',
+            mapLabel(int.etnia, ETNIA),
             int.puebloIndigena || '',
-            int.grupoPoblacional.join(','),
-            int.discapacidades.join(','),
-            Object.entries(antec).filter(([,v]) => v).map(([k]) => k).join(','),
-            Object.entries(trans).filter(([,v]) => v).map(([k]) => k).join(','),
-            int.peso || '',
-            int.talla || '',
-            int.perimetroBraquial || '',
-            int.diagNutricional || '',
-            int.practicaDeportiva ? 'SI' : 'NO',
-            int.lactanciaMaterna ? 'SI' : 'NO',
-            int.lactanciaMeses || '',
-            int.esquemaAtenciones ? 'SI' : 'NO',
-            int.intervencionesPendientes.join(','),
-            int.enfermedadAguda ? 'SI' : 'NO',
-            int.recibeAtencionMedica ? 'SI' : 'NO',
-            int.remisiones.join(','),
+            mapArray(int.grupoPoblacional, GRUPO_POBLACIONAL),
+            mapArray(int.discapacidades, DISCAPACIDADES),
+            int.peso ? String(int.peso).replace('.', ',') : '',
+            int.talla ? String(int.talla).replace('.', ',') : '',
+            int.perimetroBraquial ? String(int.perimetroBraquial).replace('.', ',') : '',
+            mapLabel(int.diagNutricional, DIAGNOSTICO_NUTRICIONAL),
+            formatBool(int.practicaDeportiva),
+            formatBool(int.lactanciaMaterna),
+            int.lactanciaMeses ?? '',
+            formatBool(int.esquemaAtenciones),
+            '', // esquemaVacunacion
+            mapArray(int.intervencionesPendientes, INTERVENCIONES_PENDIENTES),
+            formatBool(int.enfermedadAguda),
+            formatBool(int.recibeAtencionMedica),
+            mapArray(int.remisiones, REMISIONES_APS),
+            mapObjectKeys(int.antecedentes as any, ANTECEDENTES_CRONICOS),
+            mapObjectKeys(int.antecTransmisibles as any, ANTECEDENTES_TRANSMISIBLES),
           ]
           lines.push([...baseRow, ...intRow].join(';'))
         }
@@ -132,9 +185,9 @@ export async function GET() {
     }
 
     const csv = lines.join('\n')
-    const filename = `siaps_${new Date().toISOString().split('T')[0]}.csv`
+    const filename = `Base_Generada_${new Date().toISOString().split('T')[0]}.csv`
 
-    // Se debe concatenar el BOM UTF-8 directo en el body text, las cabeceras REST HTTP no toleran Caracteres de 2+ Bytes (causando error btoa/ByteString)
+    // Para Excel: \uFEFF añade BOM, asegurando lecturas correctas de caracteres latinos (ñ, tildes..)
     return new Response('\uFEFF' + csv, {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
@@ -145,3 +198,4 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
+

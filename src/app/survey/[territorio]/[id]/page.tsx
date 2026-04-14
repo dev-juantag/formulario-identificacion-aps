@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 import Link from 'next/link'
 import { ArrowLeft, Home, MapPin, Users, Calendar, Activity, Info, Building2 } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import ExportPdfButton from '@/components/ExportPdfButton'
-
-const prisma = new PrismaClient()
 
 // No forzamos re-render dinámico si queremos cache, pero siendo un dashboard es mejor dinámico
 export const dynamic = 'force-dynamic'

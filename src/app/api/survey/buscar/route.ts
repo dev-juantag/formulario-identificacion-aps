@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +38,7 @@ export async function GET(req: Request) {
             select: { nombre: true, apellidos: true, documento: true }
           }
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { consecutivo: 'desc' },
         take: limit,
         skip: skip,
       }),

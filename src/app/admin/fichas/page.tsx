@@ -120,15 +120,17 @@ export default function FichasDatabase() {
     }
   }
 
-  const handleExport = async () => {
+  const handleExport = async (all = false) => {
     setExporting(true)
     try {
-      const res = await fetch('/api/admin/export')
+      const urlFetch = all ? '/api/admin/export?all=true' : '/api/admin/export'
+      const res = await fetch(urlFetch)
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `fichas_export_${new Date().toISOString().split('T')[0]}.csv`
+      const typeStr = all ? 'general' : 'efectivas'
+      a.download = `fichas_${typeStr}_${new Date().toISOString().split('T')[0]}.csv`
       a.click()
       URL.revokeObjectURL(url)
     } catch {
@@ -169,14 +171,25 @@ export default function FichasDatabase() {
           </div>
         </div>
         
-        <button
-          onClick={handleExport}
-          disabled={exporting}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-60"
-        >
-          {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-          {exporting ? 'Exportando Datos...' : 'Exportar Fichas a CSV'}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleExport(true)}
+            disabled={exporting}
+            className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-60"
+          >
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {exporting ? 'Exportando...' : 'Exportar TODO'}
+          </button>
+          
+          <button
+            onClick={() => handleExport(false)}
+            disabled={exporting}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-60"
+          >
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {exporting ? 'Exportando...' : 'Exportar Efectivas'}
+          </button>
+        </div>
       </div>
 
       {/* Table grid */}

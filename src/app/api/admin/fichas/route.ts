@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+
 export const dynamic = 'force-dynamic'
 
 async function getAdminUser(req: Request) {
@@ -92,7 +92,7 @@ export async function GET(req: Request) {
              select: { integrantes: true }
          }
       },
-      orderBy: { fechaDiligenciamiento: 'desc' }
+      orderBy: { consecutivo: 'desc' }
     })
     return NextResponse.json(fichas)
   } catch (err: any) {

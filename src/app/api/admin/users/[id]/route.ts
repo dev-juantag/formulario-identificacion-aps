@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+
 
 // Helper restricted explicitly to SUPER_ADMIN
 async function getSuperAdminUser(req: Request) {

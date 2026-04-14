@@ -1,13 +1,20 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
     const { integrantes, territorio, microterritorio, ...hogarData } = body
+
+    if (String(hogarData.estadoVisita || '1') === '1' && (!integrantes || !Array.isArray(integrantes) || integrantes.length === 0)) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Una ficha EFECTIVA debe tener al menos un integrante familiar.' 
+      }, { status: 400 })
+    }
 
     const toIntArray = (arr: any[]): number[] =>
       (arr || []).map(val => parseInt(val)).filter(n => !isNaN(n))
